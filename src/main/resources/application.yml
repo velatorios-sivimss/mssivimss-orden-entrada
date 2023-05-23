@@ -7,12 +7,8 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
       
-
-      
   main:
     allow-circular-references: true
-    
-  
         
   servlet:
     multipart:
@@ -26,14 +22,12 @@ logging:
     org.hibernate: error
 
 endpoints:
-   mod-catalogos: ${msit_CATALOGOS}
-   ms-reportes: ${msit_REPORTES} 
+   mod-catalogos: http://localhost:8094/mssivimss-mod-catalogos/v1/generico
+   ms-reportes: http://localhost:8088//mssivimss-reportes-jasp/v1/generales/generar-reporte
    
    
 plantilla:
-  ejemplo-plantilla: ${msit_REPORTE_ACEPTACION_DONACION}
-
-
+  ejemplo-plantilla: reportes/plantilla/ControlSalidaDonacion.jrxml
 
 jwt:
   secretkey-flujo: funcionamuybien
@@ -73,4 +67,4 @@ resilience4j.timelimiter:
         
         
 formato_fecha: '%d/%m/%Y'
-ruta-log: 'C:/Users/ruta/Documents/logs/'
+ruta-log: 'C:\logs\'

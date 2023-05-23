@@ -15,8 +15,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-
-
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -83,6 +81,25 @@ public class RestTemplateUtil {
 		responseBody = (Response<List<String>>) responseEntity.getBody();
 
 		return responseBody;
+	}
+	
+	/**
+	 * Env&iacute;a una petici&oacute;n con Body y token.
+	 *
+	 * @param url
+	 * @param clazz
+	 * @return
+	 */
+	public Response<Object> sendPostRequestByteArrayTokenObject(String url, EnviarDatosRequest body, String subject,
+			Class<?> clazz) throws IOException {
+		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
+
+		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+		ResponseEntity<?> responseEntity = null;
+
+		responseEntity = restTemplate.postForEntity(url, request, clazz);
+
+		return (Response<Object>) responseEntity.getBody();
 	}
 
 	/**

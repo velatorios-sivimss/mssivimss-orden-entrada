@@ -207,7 +207,6 @@ public class SelectQueryUtil {
      * @return
      * @since 1.0.0
      */
-    @SuppressWarnings("UnusedReturnValue")
     public SelectQueryUtil setParameter(String nombre, Object valor) {
         if (this.parametros == null) {
             this.parametros = new HashMap<>();
@@ -224,7 +223,6 @@ public class SelectQueryUtil {
      * @return
      * @since 1.0.0
      */
-    @SuppressWarnings("UnusedReturnValue")
     public SelectQueryUtil orderBy(String columna) {
         this.orderBy.add(columna);
         return this;

@@ -23,6 +23,15 @@ public class MensajeResponseUtil {
 		return respuestaGenerado;
 	}
 	
+	public  static Response<Object>mensajeResponseObject(Response<Object> respuestaGenerado) {
+		Integer codigo = respuestaGenerado.getCodigo();
+		if (codigo != 200) {
+			log.error("Error.. {}", respuestaGenerado.getMensaje());
+			respuestaGenerado.setMensaje("5");
+		}
+		return respuestaGenerado;
+	}
+	
 	public  static Response<?>mensajeConsultaResponse(Response<?> respuestaGenerado, String numeroMensaje) {
 		Integer codigo = respuestaGenerado.getCodigo();
 		if (codigo == 200 &&  (!respuestaGenerado.getDatos().toString().contains("id"))){
