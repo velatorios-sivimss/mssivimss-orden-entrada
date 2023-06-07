@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.imss.sivimss.orden.entrada.service.OrdenEntradaService;
+import com.imss.sivimss.orden.entrada.service.RealizarDevolucionService;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
 import com.imss.sivimss.orden.entrada.util.LogUtil;
 import com.imss.sivimss.orden.entrada.util.ProviderServiceRestTemplate;
@@ -27,11 +27,11 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/orden-entrada")
-public class OrdenEntradaController {
+@RequestMapping("/inventario-articulo")
+public class InventarioArticuloController {
 	
 	@Autowired
-	private OrdenEntradaService ordenEntradaService;
+	private RealizarDevolucionService realizarDevolucionService;
 	
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -42,57 +42,21 @@ public class OrdenEntradaController {
 	private static final String RESILENCIA = " Resilencia  ";
 	private static final String CONSULTA = "consulta";
 	
-	@PostMapping("/consulta-orden-entrada")
+	@PostMapping("/consulta-folio-articulo")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.consultarOrdenEntrada(request,authentication);
+	public CompletableFuture<Object> consultaFolioArticulo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  realizarDevolucionService.consultarFolioArticulo(request,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
-	@PostMapping("/ultimo-registro-orden-entrada")
+	@PostMapping("/actualizar-inventario-articulo")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> ultimoRegistroOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.ultimoRegistroOrdenEntrada(request,authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-	}
-	
-	@PostMapping("/consulta-contrato-proveedor")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaContratoProveedor(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.consultarContratoProveedor(request,authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-	}
-	
-	@PostMapping("/consulta-contrato-articulo")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaContratoArticulo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.consultarContratoArticulo(request,authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-	}
-	
-	@PostMapping("/consulta-descripcion-velatorio")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaDescripcionVelatorio(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.consultarDescripcionVelatorio(request,authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-	}
-	
-	@PostMapping("/agregar/orden/entrada")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> agregaOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =   ordenEntradaService.insertarOrdenEntrada(request,authentication);
+	public CompletableFuture<Object> actualizaInventarioArticulo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =   realizarDevolucionService.actualizarInventarioArticulo(request,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
@@ -126,5 +90,6 @@ public class OrdenEntradaController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
+
 
 }

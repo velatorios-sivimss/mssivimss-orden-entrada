@@ -158,7 +158,7 @@ public class OrdenEntrada {
 			final QueryHelper q = new QueryHelper("INSERT INTO SVT_INVENTARIO_ARTICULO");
 			q.agregarParametroValues("ID_ODE", String.valueOf(ordenEntradaRequest.getIdOrdenEntrada()));
 			q.agregarParametroValues("ID_ARTICULO", String.valueOf(ordenEntradaRequest.getIdArticulo()));
-			q.agregarParametroValues("FOLIO_ARTICULO", "'" + ordenEntradaRequest.getNumFolioArticulo() + "'");
+			q.agregarParametroValues("FOLIO_ARTICULO", "'" +Integer.toString(ordenEntradaRequest.getIdOrdenEntrada()).concat(Integer.toString(i).concat(ordenEntradaRequest.getNumFolioArticulo()))+ "'");
 			q.agregarParametroValues("ID_TIPO_ASIGNACION_ART", String.valueOf(1));
 			q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
 			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);
