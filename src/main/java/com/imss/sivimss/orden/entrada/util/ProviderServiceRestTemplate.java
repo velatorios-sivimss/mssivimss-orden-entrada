@@ -29,19 +29,6 @@ public class ProviderServiceRestTemplate {
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
-
-	public Response<?> consumirServicio(Map<String, Object> dato, String url, Authentication authentication)
-			throws IOException {
-		try {
-			Response<?> respuestaGenerado = restTemplateUtil.sendPostRequestByteArrayToken(url,
-					new EnviarDatosRequest(dato), jwtTokenProvider.createToken((String) authentication.getPrincipal()),
-					Response.class);
-			return validarResponse(respuestaGenerado);
-		} catch (IOException exception) {
-			log.error(ERROR);
-			throw exception;
-		}
-	}
 	
 	public Response<Object> consumirServicioObject(Map<String, Object> dato, String url, Authentication authentication)
 			throws IOException {
@@ -56,32 +43,17 @@ public class ProviderServiceRestTemplate {
 		}
 	}
 
-	public Response<?> consumirServicioReportes(Map<String, Object> dato,
+	public Response<Object> consumirServicioReportes(Map<String, Object> dato,
 			String url, Authentication authentication) throws IOException {
 		try {
-			Response<?> respuestaGenerado = restTemplateUtil.sendPostRequestByteArrayReportesToken(url,
+			Response<Object> respuestaGenerado = restTemplateUtil.sendPostRequestByteArrayReportesToken(url,
 					new DatosReporteDTO(dato),
 					jwtTokenProvider.createToken((String) authentication.getPrincipal()), Response.class);
-			return validarResponse(respuestaGenerado);
+			return validarResponseObject(respuestaGenerado);
 		} catch (IOException exception) {
 			log.error(ERROR);
 			throw exception;
 		}
-	}
-
-	public Response<?> validarResponse(Response<?> respuestaGenerado) {
-		String codigo = respuestaGenerado.getMensaje().substring(0, 3);
-		if (codigo.equals("500") || codigo.equals("404") || codigo.equals("400") || codigo.equals("403")) {
-			Gson gson = new Gson();
-			String mensaje = respuestaGenerado.getMensaje().substring(7, respuestaGenerado.getMensaje().length() - 1);
-
-			ErrorsMessageResponse apiExceptionResponse = gson.fromJson(mensaje, ErrorsMessageResponse.class);
-
-			respuestaGenerado = Response.builder().codigo((int) apiExceptionResponse.getCodigo()).error(true)
-					.mensaje(apiExceptionResponse.getMensaje()).datos(apiExceptionResponse.getDatos()).build();
-
-		}
-		return respuestaGenerado;
 	}
 	
 	public Response<Object> validarResponseObject(Response<Object> respuestaGenerado) {

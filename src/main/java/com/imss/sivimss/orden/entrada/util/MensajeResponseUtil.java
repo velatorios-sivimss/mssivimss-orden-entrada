@@ -32,9 +32,9 @@ public class MensajeResponseUtil {
 		return respuestaGenerado;
 	}
 	
-	public  static Response<?>mensajeConsultaResponse(Response<?> respuestaGenerado, String numeroMensaje) {
+	public  static Response<Object>mensajeConsultaResponse(Response<Object> respuestaGenerado, String numeroMensaje) {
 		Integer codigo = respuestaGenerado.getCodigo();
-		if (codigo == 200 &&  (!respuestaGenerado.getDatos().toString().contains("id"))){
+		if (codigo == 200 &&  (!respuestaGenerado.getDatos().toString().contains("ID"))){
 			respuestaGenerado.setMensaje(numeroMensaje);
 		}
 		return respuestaGenerado;
