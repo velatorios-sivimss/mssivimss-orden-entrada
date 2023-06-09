@@ -61,66 +61,43 @@ public class OrdenEntrada {
 		log.info(" TERMINO - consultarOrdenEntrada");
 		return request;
 	}
-
-	public DatosRequest ultimoRegistroOrdenEntrada(DatosRequest request) {
-		log.info(" INICIO - ultimoRegistroOrdenEntrada");
+	
+	public DatosRequest consultaFolioOrdenEntrada(DatosRequest request, UsuarioDto usuarioDto) {
+		log.info(" INICIO - consultaFolioOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("MAX(OE.ID_ODE) + 1 AS ID_ODE").from("SVT_ORDEN_ENTRADA OE");
+		queryUtil.select("(SELECT MAX(OE.ID_ODE) + 1 FROM SVT_ORDEN_ENTRADA OE ) AS idOrdenEntrada",
+				"CONCAT_WS('', (SELECT LPAD (MAX(OE.ID_ODE) + 1, 4, '0') FROM SVT_ORDEN_ENTRADA OE),'ODE',(SELECT SUBSTRING(SV.DES_VELATORIO,1,3) AS DESVELATORIO FROM SVC_VELATORIO SV WHERE SV.ID_VELATORIO = "+usuarioDto.getIdVelatorio()+")) AS numFolio",
+				"(SELECT MAX(IA.ID_INVE_ARTICULO) FROM SVT_INVENTARIO_ARTICULO IA ) AS idInventarioArticulo")
+		.from("DUAL");
 		final String query = queryUtil.build();
-		log.info(" ultimoRegistroOrdenEntrada: " + query);
+		log.info(" consultaFolioOrdenEntrada: " + query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
-		log.info(" TERMINO - ultimoRegistroOrdenEntrada");
+		log.info(" TERMINO - consultaFolioOrdenEntrada");
 		return request;
 	}
 
-	public DatosRequest consultarContratoProveedor(DatosRequest request, ContratoRequest contrato) {
-		log.info(" INICIO - consultarContratoProveedor");
-		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("P.ID_PROVEEDOR AS FOLIO_PROVEEDOR", "P.NOM_PROVEEDOR AS NOM_PROVEEDOR")
-				.from("SVT_PROVEEDOR P").innerJoin(ConsultaConstantes.SVT_CONTRATO_C, "P.ID_PROVEEDOR = C.ID_PROVEEDOR")
-				.and("P.IND_ACTIVO = 1").where(ConsultaConstantes.C_ID_CONTRATO_ID_CONTRATO)
-				.setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato());
-		final String query = queryUtil.build();
-		log.info(" consultarContratoProveedor: " + query);
-		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
-		request.getDatos().put(AppConstantes.QUERY, encoded);
-		log.info(" TERMINO - consultarContratoProveedor");
-		return request;
-	}
-
-	public DatosRequest consultarContratoArticulo(DatosRequest request, ContratoRequest contrato) {
-		log.info(" INICIO - consultarContratoArticulo");
+	public DatosRequest consultarContratoProveedorArticulo(DatosRequest request, ContratoRequest contrato) {
+		log.info(" INICIO - consultarContratoProveedorArticulo");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("A.ID_ARTICULO AS ID_ARTICULO", "CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
+				.select("C.ID_CONTRATO AS ID_CONTRATO","P.ID_PROVEEDOR AS FOLIO_PROVEEDOR","P.NOM_PROVEEDOR AS NOM_PROVEEDOR",
+						"A.ID_ARTICULO AS ID_ARTICULO", "CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
 						"A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "COA.MON_COSTO_UNITARIO as MON_COSTO_UNITARIO",
-						"COA.MON_PRECIO AS MON_PRECIO")
+						"COA.MON_PRECIO AS MON_PRECIO","V.DES_VELATORIO as DES_VELATORIO")
 				.from("SVT_CONTRATO_ARTICULOS COA")
-				.innerJoin(ConsultaConstantes.SVT_CONTRATO_C, "COA.ID_CONTRATO  = C.ID_CONTRATO")
-				.and("C.FEC_FIN_VIG IS NULL")
+				.innerJoin(ConsultaConstantes.SVT_CONTRATO_C, "COA.ID_CONTRATO  = C.ID_CONTRATO").and("C.FEC_FIN_VIG IS NULL")
+				.innerJoin("SVT_PROVEEDOR P", "P.ID_PROVEEDOR = C.ID_PROVEEDOR")
+				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = C.ID_VELATORIO")
 				.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, "A.ID_ARTICULO = COA.ID_ARTICULO ")
 				.innerJoin("SVC_CATEGORIA_ARTICULO CA", "A.ID_CATEGORIA_ARTICULO  = CA.ID_CATEGORIA_ARTICULO")
-				.where(ConsultaConstantes.C_ID_CONTRATO_ID_CONTRATO)
-				.setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato());
+				.where(ConsultaConstantes.C_NUM_CONTRATO_NUM_CONTRATO)
+				.setParameter(ConsultaConstantes.NUM_CONTRATO, contrato.getNumContrato());
 		final String query = queryUtil.build();
-		log.info(" consultarContratoCategoriaArticulo: " + query);
+		log.info(" consultarContratoProveedorArticulo: " + query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
-		log.info(" TERMINO - consultarContratoArticulo");
-		return request;
-	}
-
-	public DatosRequest consultarDescripcionVelatorio(DatosRequest request, UsuarioDto usuarioDto) {
-		log.info(" INICIO - consultarDescripcionVelatorio");
-		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("V.DES_VELATORIO").from("SVC_VELATORIO V").where("V.ID_VELATORIO = :idVelatorio").setParameter(
-				ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
-		final String query = queryUtil.build();
-		log.info(" consultarDescripcionVelatorio: " + query);
-		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
-		request.getDatos().put(AppConstantes.QUERY, encoded);
-		log.info(" TERMINO - consultarDescripcionVelatorio");
+		log.info(" TERMINO - consultarContratoProveedorArticulo");
 		return request;
 	}
 
@@ -154,11 +131,11 @@ public class OrdenEntrada {
 	public String insertInventarioArticulo(OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
 		log.info(" INICIO - insertInventarioArticulo");
 		StringBuilder query = new StringBuilder();
-		for (int i = 1; i <= ordenEntradaRequest.getNumArticulo(); i++) {
+		for (int i = 0; i < ordenEntradaRequest.getNumArticulo(); i++) {
 			final QueryHelper q = new QueryHelper("INSERT INTO SVT_INVENTARIO_ARTICULO");
 			q.agregarParametroValues("ID_ODE", String.valueOf(ordenEntradaRequest.getIdOrdenEntrada()));
 			q.agregarParametroValues("ID_ARTICULO", String.valueOf(ordenEntradaRequest.getIdArticulo()));
-			q.agregarParametroValues("FOLIO_ARTICULO", "'" +Integer.toString(ordenEntradaRequest.getIdOrdenEntrada()).concat(Integer.toString(i).concat(ordenEntradaRequest.getNumFolioArticulo()))+ "'");
+			q.agregarParametroValues("FOLIO_ARTICULO", "'" +Integer.toString(ordenEntradaRequest.getIdInventarioArticulo()+i).concat(Integer.toString(ordenEntradaRequest.getFolioProveedor()).concat(ConsultaConstantes.filter(ordenEntradaRequest.getDesModeloArticulo()).toUpperCase()))+ "'");
 			q.agregarParametroValues("ID_TIPO_ASIGNACION_ART", String.valueOf(1));
 			q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
 			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);

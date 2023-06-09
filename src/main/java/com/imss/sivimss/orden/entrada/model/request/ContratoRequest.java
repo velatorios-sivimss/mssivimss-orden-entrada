@@ -9,5 +9,7 @@ public class ContratoRequest {
 	
 	@JsonProperty
 	private Integer idContrato;
+	@JsonProperty
+	private String numContrato;
 
 }

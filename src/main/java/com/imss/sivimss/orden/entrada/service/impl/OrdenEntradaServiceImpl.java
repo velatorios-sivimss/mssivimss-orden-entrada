@@ -1,10 +1,13 @@
 package com.imss.sivimss.orden.entrada.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -15,6 +18,7 @@ import com.imss.sivimss.orden.entrada.beans.OrdenEntrada;
 import com.imss.sivimss.orden.entrada.model.request.ContratoRequest;
 import com.imss.sivimss.orden.entrada.model.request.OrdenEntradaRequest;
 import com.imss.sivimss.orden.entrada.model.request.UsuarioDto;
+import com.imss.sivimss.orden.entrada.model.response.OrdenEntradaResponse;
 import com.imss.sivimss.orden.entrada.service.OrdenEntradaService;
 import com.imss.sivimss.orden.entrada.util.AppConstantes;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
@@ -40,6 +44,9 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 	
+	@Autowired 
+	private ModelMapper modelMapper;
+	
 	@Value("${endpoints.mod-catalogos}")
 	private String urlModCatalogos;
 	
@@ -47,74 +54,17 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 	private LogUtil logUtil;
 
 	@Override
-	public Response<Object> ultimoRegistroOrdenEntrada(DatosRequest request, Authentication authentication)
-			throws IOException {
-		try {
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar ultimo registro orden entrada ", CONSULTA, authentication);
-
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().ultimoRegistroOrdenEntrada(request).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
-
-		} catch (Exception e) {
-			String consulta = new OrdenEntrada().ultimoRegistroOrdenEntrada(request).getDatos().get(AppConstantes.QUERY).toString();
-			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
-					authentication);
-			throw new IOException(ERROR_INFORMACION, e.getCause());
-		}
-	}
-	
-	@Override
-	public Response<Object> consultarContratoProveedor(DatosRequest request, Authentication authentication) throws IOException {
-		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
-		try {
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato proveedor ", CONSULTA, authentication);
-
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoProveedor(request, contratoRequest).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
-
-		} catch (Exception e) {
-			String consulta = new OrdenEntrada().consultarContratoProveedor(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
-			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
-					authentication);
-			throw new IOException(ERROR_INFORMACION, e.getCause());
-		}
-	}
-
-	@Override
-	public Response<Object> consultarContratoArticulo(DatosRequest request, Authentication authentication)
+	public Response<Object> consultarContratoProveedorArticulo(DatosRequest request, Authentication authentication)
 			throws IOException {
 		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoArticulo(request, contratoRequest).getDatos(),
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoProveedorArticulo(request, contratoRequest).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new OrdenEntrada().consultarContratoArticulo(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
-			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
-			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
-			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
-					authentication);
-			throw new IOException(ERROR_INFORMACION, e.getCause());
-		}
-	}
-
-	@Override
-	public Response<Object> consultarDescripcionVelatorio(DatosRequest request, Authentication authentication) throws IOException {
-		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
-		try {
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
-
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarDescripcionVelatorio(request, usuarioDto).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
-
-		} catch (Exception e) {
-			String consulta = new OrdenEntrada().consultarDescripcionVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			String consulta = new OrdenEntrada().consultarContratoProveedorArticulo(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -129,8 +79,20 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," insertar orden entrada ", ALTA,authentication);
-				return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),
-						urlModCatalogos.concat("/crearMultiple"), authentication));
+				List<OrdenEntradaResponse> ordenEntradaResponse;
+				Response<Object> response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultaFolioOrdenEntrada(request, usuarioDto).getDatos(),
+						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+				if (response.getCodigo()==200) {
+					if (!response.getDatos().toString().contains("[]")) {
+						ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
+						ordenEntradaRequest.setIdOrdenEntrada(ordenEntradaResponse.get(0).getIdOrdenEntrada());
+						ordenEntradaRequest.setNumFolioOrdenEntrada(ordenEntradaResponse.get(0).getNumFolio());
+						ordenEntradaRequest.setIdInventarioArticulo(ordenEntradaResponse.get(0).getIdInventarioArticulo());
+						return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),
+								urlModCatalogos.concat("/crearMultiple"), authentication));
+					}
+				}
+				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
             String consulta = new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));

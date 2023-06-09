@@ -17,9 +17,15 @@ public class OrdenEntradaRequest {
 	@JsonProperty
 	private Integer idArticulo;
 	@JsonProperty
+	private Integer idInventarioArticulo;
+	@JsonProperty
 	private Integer numArticulo;
 	@JsonProperty
 	private String numFolioArticulo;
+	@JsonProperty
+	private Integer folioProveedor;
+	@JsonProperty
+	private String desModeloArticulo;
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private String fecIngreso;
 	@JsonProperty
