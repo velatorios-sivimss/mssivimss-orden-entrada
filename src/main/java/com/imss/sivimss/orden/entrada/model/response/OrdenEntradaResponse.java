@@ -10,5 +10,7 @@ public class OrdenEntradaResponse {
 	private Integer idOrdenEntrada;
 	
 	private Integer idInventarioArticulo;
+	
+	private Integer numArticulo;
 
 }

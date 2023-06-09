@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.imss.sivimss.orden.entrada.service.CerrarOrdenEntradaService;
 import com.imss.sivimss.orden.entrada.service.OrdenEntradaService;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
 import com.imss.sivimss.orden.entrada.util.LogUtil;
@@ -35,6 +36,9 @@ public class OrdenEntradaController {
 	
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
+	
+	@Autowired
+	private CerrarOrdenEntradaService cerrarOrdenEntradaService;
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -60,12 +64,30 @@ public class OrdenEntradaController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@PostMapping("/consulta-contrato-velatorio")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaContratoPorVelatorio(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  ordenEntradaService.consultarContratoPorVelatorio(request,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	@PostMapping("/agregar/orden/entrada")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> agregaOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		Response<Object> response =   ordenEntradaService.insertarOrdenEntrada(request,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/actualizar/orden/entrada")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> actualizaOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  cerrarOrdenEntradaService.actualizarOrdenEntrada(request,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	

@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ConsultaStockServiceImpl implements ConsultaStockService {
 	
+	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
@@ -112,9 +113,14 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar stock", CONSULTA, authentication);
+			
+			Response<Object> response = providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+			if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
+				return MensajeResponseUtil.mensajeResponseObject(response);
+			}
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+			return MensajeResponseUtil.mensajeResponse(response,NO_SE_ENCONTRO_INFORMACION );
 
 		} catch (Exception e) {
 			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();

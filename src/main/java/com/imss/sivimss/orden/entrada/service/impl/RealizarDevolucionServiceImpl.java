@@ -1,19 +1,23 @@
 package com.imss.sivimss.orden.entrada.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
-import com.imss.sivimss.orden.entrada.beans.RealizarDevolucion;
+import com.imss.sivimss.orden.entrada.beans.RealizarDevolucionArticulo;
 import com.imss.sivimss.orden.entrada.model.request.InventarioArticuloRequest;
 import com.imss.sivimss.orden.entrada.model.request.UsuarioDto;
+import com.imss.sivimss.orden.entrada.model.response.OrdenEntradaResponse;
 import com.imss.sivimss.orden.entrada.service.RealizarDevolucionService;
 import com.imss.sivimss.orden.entrada.util.AppConstantes;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
@@ -44,17 +48,20 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 	@Autowired
 	private LogUtil logUtil;
 	
+	@Autowired 
+	private ModelMapper modelMapper;
+	
 	@Override
 	public Response<Object> consultarFolioArticulo(DatosRequest request, Authentication authentication)throws IOException {
 		InventarioArticuloRequest inventarioArticuloRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), InventarioArticuloRequest.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new RealizarDevolucion().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos(),
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new RealizarDevolucion().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos().get(AppConstantes.QUERY).toString();
+			String consulta = new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -69,10 +76,17 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," actualizar inventario articulo ", MODIFICACION, authentication);
-				return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new RealizarDevolucion().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).getDatos(),
-						urlModCatalogos.concat("/actualizar"), authentication));
+				List<OrdenEntradaResponse> ordenEntradaResponse;
+				Response<Object> response =  providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarOrdenEntrada(request, inventarioArticuloRequest).getDatos(),
+						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
+					ordenEntradaResponse = Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
+					inventarioArticuloRequest.setNumArticulo(ordenEntradaResponse.get(0).getNumArticulo());
+					return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicio(new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication));
+				}
+				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
-            String consulta = new RealizarDevolucion().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+            String consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
             logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, MODIFICACION, authentication);

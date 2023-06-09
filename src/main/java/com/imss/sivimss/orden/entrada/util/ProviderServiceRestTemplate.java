@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-
 import com.google.gson.Gson;
 import com.imss.sivimss.orden.entrada.security.jwt.JwtTokenProvider;
 
@@ -41,6 +40,13 @@ public class ProviderServiceRestTemplate {
 			log.error(ERROR);
 			throw exception;
 		}
+	}
+	
+	public Response<Object> consumirServicio(Object dato, String url, Authentication authentication) {
+		Response<Object> respuestaGenerado =  restTemplateUtil.sendPostRequestByteArrayToken(url,
+				dato, jwtTokenProvider.createToken((String) authentication.getPrincipal()),
+				Response.class);
+		return validarResponseObject(respuestaGenerado);
 	}
 
 	public Response<Object> consumirServicioReportes(Map<String, Object> dato,

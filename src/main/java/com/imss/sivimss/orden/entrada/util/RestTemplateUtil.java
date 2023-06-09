@@ -37,6 +37,24 @@ public class RestTemplateUtil {
 
 		return (Response<Object>) responseEntity.getBody();
 	}
+	
+	/**
+	 * Env&iacute;a una petici&oacute;n con Body y token.
+	 *
+	 * @param url
+	 * @param clazz
+	 * @return
+	 */
+	public Response<Object> sendPostRequestByteArrayToken(String url, Object body, String subject,
+			Class<?> clazz) {
+		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
+
+		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+
+		 ResponseEntity<Object> responseEntity = (ResponseEntity<Object>) restTemplate.postForEntity(url, request, clazz);
+
+		return (Response<Object>) responseEntity.getBody();
+	}
 
 	/**
 	 * Crea los headers para la petici&oacute;n con token  - falta agregar el

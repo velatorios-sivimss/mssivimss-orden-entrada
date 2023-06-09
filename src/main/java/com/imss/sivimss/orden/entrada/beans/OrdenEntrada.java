@@ -76,6 +76,21 @@ public class OrdenEntrada {
 		log.info(" TERMINO - consultaFolioOrdenEntrada");
 		return request;
 	}
+	
+	public DatosRequest consultarContratoPorVelatorio(DatosRequest request, UsuarioDto usuarioDto) {
+		log.info(" INICIO - consultarOrdenEntradaPorVelatorio");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("C.ID_CONTRATO AS ID_CONTRATO","C.NUM_CONTRATO AS NUM_CONTRATO").from("SVT_CONTRATO C")
+		.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = C.ID_VELATORIO").where("C.ID_TIPO_ASIGNACION  = 2")
+		.and("C.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
+		final String query = queryUtil.build();
+		log.info(" consultarOrdenEntradaPorVelatorio: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - consultarOrdenEntradaPorVelatorio");
+		return request;
+	}
 
 	public DatosRequest consultarContratoProveedorArticulo(DatosRequest request, ContratoRequest contrato) {
 		log.info(" INICIO - consultarContratoProveedorArticulo");

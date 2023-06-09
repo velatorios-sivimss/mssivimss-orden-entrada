@@ -123,4 +123,25 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 		}
 	}
 
+	@Override
+	public Response<Object> consultarContratoPorVelatorio(DatosRequest request, Authentication authentication)
+			throws IOException {
+		 UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		try {
+			
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato por velatorio ", CONSULTA, authentication);
+
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoPorVelatorio(request,  usuarioDto).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+
+		} catch (Exception e) {
+			String consulta = new OrdenEntrada().consultarContratoPorVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
 }
