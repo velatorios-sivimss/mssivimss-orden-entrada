@@ -34,5 +34,7 @@ public class OrdenEntradaRequest {
 	private String fechaInicio;
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private String fechaFin;
+	@JsonProperty
+	private Integer indEstatus;
 
 }

@@ -7,7 +7,9 @@ import org.springframework.security.core.Authentication;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
 import com.imss.sivimss.orden.entrada.util.Response;
 
-public interface CerrarOrdenEntradaService {
+public interface CancelarCerrarOrdenEntradaService {
+	
+	Response<Object> consultarDetalleOrdenEntrada(DatosRequest request, Authentication authentication) throws IOException;
 	
 	Response<Object> actualizarOrdenEntrada(DatosRequest request, Authentication authentication) throws IOException;
 

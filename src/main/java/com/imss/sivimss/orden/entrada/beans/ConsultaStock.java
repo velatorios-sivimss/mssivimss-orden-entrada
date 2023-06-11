@@ -61,7 +61,7 @@ public class ConsultaStock {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("OE.FEC_INGRESO AS FEC_ODE","OE.NUM_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
 				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_ORDEN_ENTRADA OE")
-		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SIA.ID_ODE = OE.ID_ODE")
+		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)")
 		.innerJoin("SVT_ARTICULO A","A.ID_ARTICULO = SIA.ID_ARTICULO")
 		.innerJoin("SVC_CATEGORIA_ARTICULO CA", "A.ID_CATEGORIA_ARTICULO  = CA.ID_CATEGORIA_ARTICULO")
 		.where("SIA.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
