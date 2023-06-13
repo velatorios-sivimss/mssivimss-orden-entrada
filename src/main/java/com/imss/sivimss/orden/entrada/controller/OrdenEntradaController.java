@@ -55,12 +55,12 @@ public class OrdenEntradaController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
-	@PostMapping("/consulta-contrato-proveedor-articulo")
+	@PostMapping("/consulta-contrato-proveedor")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaContratoProveedorArticulo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
-		Response<Object> response =  ordenEntradaService.consultarContratoProveedorArticulo(request,authentication);
+	public CompletableFuture<Object> consultaContratoProveedor(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  ordenEntradaService.consultarContratoProveedor(request,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
@@ -97,6 +97,33 @@ public class OrdenEntradaController {
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> consultaDetalleOrdenEntrada(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
 		Response<Object> response =  cancelarCerrarOrdenEntradaService.consultarDetalleOrdenEntrada(request, authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/consulta-contrato-categoria")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaContratoCategoria(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  ordenEntradaService.consultarContratoCategoria(request,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/consulta-contrato-modelo")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaContratoModelo(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  ordenEntradaService.consultarContratoModelo(request,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/consulta-contrato-costo")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaContratoCosto(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  ordenEntradaService.consultarContratoCosto(request,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	

@@ -32,11 +32,11 @@ public class OrdenEntrada {
 						"OE.NUM_ARTICULO AS NUM_ARTICULO", "OE.FEC_INGRESO AS FEC_ODE",
 						"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA")
 				.from("SVT_ORDEN_ENTRADA OE").innerJoin("SVT_CONTRATO C", "OE.ID_CONTRATO = C.ID_CONTRATO")
-				.and("C.FEC_FIN_VIG IS NULL").innerJoin("SVT_CONTRATO_ARTICULOS SCA", "C.ID_CONTRATO = SCA.ID_CONTRATO")
+				.and("C.FEC_FIN_VIG IS NULL").innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA, "C.ID_CONTRATO = SCA.ID_CONTRATO")
 				.innerJoin("SVT_PROVEEDOR P", "C.ID_PROVEEDOR = P.ID_PROVEEDOR").and("P.IND_ACTIVO = 1")
 				.innerJoin("SVC_VELATORIO V", "C.ID_VELATORIO = V.ID_VELATORIO").and("V.IND_ACTIVO = 1")
-				.innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SCA.ID_ARTICULO")
-				.innerJoin("SVC_CATEGORIA_ARTICULO CA", "CA.ID_CATEGORIA_ARTICULO  = A.ID_CATEGORIA_ARTICULO");
+				.innerJoin(ConsultaConstantes.SVT_ARTICULO_A,ConsultaConstantes. A_ID_ARTICULO_SCA_ID_ARTICULO)
+				.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, "CA.ID_CATEGORIA_ARTICULO  = A.ID_CATEGORIA_ARTICULO");
 		
 		if(usuarioDto.getIdVelatorio() != null) {
 			queryUtil.where("C.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
@@ -91,28 +91,78 @@ public class OrdenEntrada {
 		log.info(" TERMINO - consultarOrdenEntradaPorVelatorio");
 		return request;
 	}
-
-	public DatosRequest consultarContratoProveedorArticulo(DatosRequest request, ContratoRequest contrato) {
-		log.info(" INICIO - consultarContratoProveedorArticulo");
+	
+	public DatosRequest consultarContratoProveedor(DatosRequest request, ContratoRequest contrato) {
+		log.info(" INICIO - consultarContratoProveedor");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("C.ID_CONTRATO AS ID_CONTRATO","P.ID_PROVEEDOR AS FOLIO_PROVEEDOR","P.NOM_PROVEEDOR AS NOM_PROVEEDOR",
-						"A.ID_ARTICULO AS ID_ARTICULO", "CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
-						"A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "COA.MON_COSTO_UNITARIO as MON_COSTO_UNITARIO",
-						"COA.MON_PRECIO AS MON_PRECIO","V.DES_VELATORIO as DES_VELATORIO")
-				.from("SVT_CONTRATO_ARTICULOS COA")
-				.innerJoin(ConsultaConstantes.SVT_CONTRATO_C, "COA.ID_CONTRATO  = C.ID_CONTRATO").and("C.FEC_FIN_VIG IS NULL")
-				.innerJoin("SVT_PROVEEDOR P", "P.ID_PROVEEDOR = C.ID_PROVEEDOR")
-				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = C.ID_VELATORIO")
-				.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, "A.ID_ARTICULO = COA.ID_ARTICULO ")
-				.innerJoin("SVC_CATEGORIA_ARTICULO CA", "A.ID_CATEGORIA_ARTICULO  = CA.ID_CATEGORIA_ARTICULO")
-				.where(ConsultaConstantes.C_NUM_CONTRATO_NUM_CONTRATO)
-				.setParameter(ConsultaConstantes.NUM_CONTRATO, contrato.getNumContrato());
+				.select("SC.ID_CONTRATO AS ID_CONTRATO","SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.NOM_PROVEEDOR AS NOM_PROVEEDOR",
+						"SV.DES_VELATORIO as DES_VELATORIO")
+				.from(ConsultaConstantes.SVT_CONTRATO_SC)
+				.innerJoin("SVT_PROVEEDOR SP", "SP.ID_PROVEEDOR = SC.ID_PROVEEDOR")
+				.innerJoin("SVC_VELATORIO SV", "SV.ID_VELATORIO = SC.ID_VELATORIO")
+				.where(ConsultaConstantes.SC_ID_CONTRATO_ID_CONTRATO).setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato());
 		final String query = queryUtil.build();
-		log.info(" consultarContratoProveedorArticulo: " + query);
+		log.info(" consultarContratoProveedor: " + query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
-		log.info(" TERMINO - consultarContratoProveedorArticulo");
+		log.info(" TERMINO - consultarContratoProveedor");
+		return request;
+	}
+	
+	public DatosRequest consultarContratoCategoria(DatosRequest request, ContratoRequest contrato) {
+		log.info(" INICIO - consultarContratoCategoria");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("DISTINCT CA.ID_CATEGORIA_ARTICULO AS ID_CATEGORIA_ARTICULO","CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO")
+		.from(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA)
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
+		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
+		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
+		.where(ConsultaConstantes.SC_ID_CONTRATO_ID_CONTRATO).setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato());
+		final String query = queryUtil.build();
+		log.info(" consultarContratoCategoria: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - consultarContratoCategoria");
+		return request;
+	}
+	
+	public DatosRequest consultarContratoModelo(DatosRequest request, ContratoRequest contrato) {
+		log.info(" INICIO - consultarContratoModelo");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("A.ID_ARTICULO AS ID_ARTICULO","A.DES_MODELO_ARTICULO  AS DES_MODELO_ARTICULO")
+		.from(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA)
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
+		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
+		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
+		.where(ConsultaConstantes.SC_ID_CONTRATO_ID_CONTRATO).setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato())
+		.and("CA.ID_CATEGORIA_ARTICULO = :idCategoriaArticulo").setParameter("idCategoriaArticulo", contrato.getIdCategoriaArticulo());
+		final String query = queryUtil.build();
+		log.info(" consultarContratoModelo: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - consultarContratoModelo");
+		return request;
+	}
+	
+	public DatosRequest consultarContratoCosto(DatosRequest request, ContratoRequest contrato) {
+		log.info(" INICIO - consultarContratoModelo");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("A.ID_ARTICULO AS ID_ARTICULO","SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
+		.from(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA)
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
+		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
+		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
+		.where(ConsultaConstantes.SC_ID_CONTRATO_ID_CONTRATO).setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato())
+		.and("SCA.ID_ARTICULO = :idArticulo").setParameter("idArticulo", contrato.getIdArticulo());
+		final String query = queryUtil.build();
+		log.info(" consultarContratoModelo: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - consultarContratoModelo");
 		return request;
 	}
 

@@ -11,7 +11,13 @@ public interface OrdenEntradaService {
 	
 	Response<Object> consultarOrdenEntrada(DatosRequest request, Authentication authentication) throws IOException;
 	
-	Response<Object> consultarContratoProveedorArticulo(DatosRequest request, Authentication authentication) throws IOException ;
+	Response<Object> consultarContratoProveedor(DatosRequest request, Authentication authentication) throws IOException ;
+	
+	Response<Object> consultarContratoCategoria(DatosRequest request, Authentication authentication) throws IOException ;
+	
+	Response<Object> consultarContratoModelo(DatosRequest request, Authentication authentication) throws IOException ;
+	
+	Response<Object> consultarContratoCosto(DatosRequest request, Authentication authentication) throws IOException ;
 	
 	Response<Object> consultarContratoPorVelatorio(DatosRequest request, Authentication authentication) throws IOException ;
 	

@@ -54,17 +54,17 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 	private LogUtil logUtil;
 
 	@Override
-	public Response<Object> consultarContratoProveedorArticulo(DatosRequest request, Authentication authentication)
+	public Response<Object> consultarContratoProveedor(DatosRequest request, Authentication authentication)
 			throws IOException {
 		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
 		try {
-			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato proveedor ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoProveedorArticulo(request, contratoRequest).getDatos(),
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoProveedor(request, contratoRequest).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new OrdenEntrada().consultarContratoProveedorArticulo(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
+			String consulta = new OrdenEntrada().consultarContratoProveedor(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -136,6 +136,66 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 
 		} catch (Exception e) {
 			String consulta = new OrdenEntrada().consultarContratoPorVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarContratoCategoria(DatosRequest request, Authentication authentication)
+			throws IOException {
+		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
+		try {
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato categoria ", CONSULTA, authentication);
+
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoCategoria(request, contratoRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+
+		} catch (Exception e) {
+			String consulta = new OrdenEntrada().consultarContratoCategoria(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarContratoModelo(DatosRequest request, Authentication authentication)
+			throws IOException {
+		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
+		try {
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato modelo ", CONSULTA, authentication);
+
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoModelo(request, contratoRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+
+		} catch (Exception e) {
+			String consulta = new OrdenEntrada().consultarContratoModelo(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarContratoCosto(DatosRequest request, Authentication authentication)
+			throws IOException {
+		ContratoRequest contratoRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ContratoRequest.class);
+		try {
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato costo ", CONSULTA, authentication);
+
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarContratoCosto(request, contratoRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+
+		} catch (Exception e) {
+			String consulta = new OrdenEntrada().consultarContratoCosto(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,

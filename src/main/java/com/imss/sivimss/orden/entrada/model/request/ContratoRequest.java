@@ -11,5 +11,9 @@ public class ContratoRequest {
 	private Integer idContrato;
 	@JsonProperty
 	private String numContrato;
+	@JsonProperty
+	private Integer idArticulo;
+	@JsonProperty
+	private Integer idCategoriaArticulo;
 
 }
