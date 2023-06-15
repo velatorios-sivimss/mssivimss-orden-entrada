@@ -62,12 +62,13 @@ public class OrdenEntrada {
 		return request;
 	}
 	
-	public DatosRequest consultaFolioOrdenEntrada(DatosRequest request, UsuarioDto usuarioDto) {
+	public DatosRequest consultaFolioOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
 		log.info(" INICIO - consultaFolioOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("(SELECT MAX(OE.ID_ODE) + 1 FROM SVT_ORDEN_ENTRADA OE ) AS idOrdenEntrada",
 				"CONCAT_WS('', (SELECT LPAD (MAX(OE.ID_ODE) + 1, 4, '0') FROM SVT_ORDEN_ENTRADA OE),'ODE',(SELECT SUBSTRING(SV.DES_VELATORIO,1,3) AS DESVELATORIO FROM SVC_VELATORIO SV WHERE SV.ID_VELATORIO = "+usuarioDto.getIdVelatorio()+")) AS numFolio",
-				"(SELECT MAX(IA.ID_INVE_ARTICULO) FROM SVT_INVENTARIO_ARTICULO IA ) AS idInventarioArticulo")
+				"(SELECT MAX(IA.ID_INVE_ARTICULO) FROM SVT_INVENTARIO_ARTICULO IA ) AS idInventarioArticulo",
+				"(SELECT A.CAN_UNIDAD FROM SVT_ARTICULO A WHERE A.ID_ARTICULO = "+ordenEntradaRequest.getIdArticulo()+" ) AS cantidadUnidadArticulo")
 		.from("DUAL");
 		final String query = queryUtil.build();
 		log.info(" consultaFolioOrdenEntrada: " + query);
@@ -210,6 +211,25 @@ public class OrdenEntrada {
 		}
 		log.info(" TERMINO - insertInventarioArticulo");
 		return query.toString();
+	}
+	
+	public DatosRequest actualizaArticulor(OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
+		log.info(" INICIO - actualizaArticulor");
+		DatosRequest request = new DatosRequest();
+		Map<String, Object> parametro = new HashMap<>();
+
+		final QueryHelper q = new QueryHelper("UPDATE SVT_ARTICULO");
+		q.agregarParametroValues("CAN_UNIDAD", Integer.toString(ordenEntradaRequest.getCantidadUnidadArticulo()+ordenEntradaRequest.getNumArticulo()));
+		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
+		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q.addWhere("ID_ARTICULO = " + ordenEntradaRequest.getIdArticulo());
+		
+		String query = q.obtenerQueryActualizar();
+		log.info(" actualizaArticulor: " + query);
+		parametro.put(AppConstantes.QUERY, DatatypeConverter.printBase64Binary(q.obtenerQueryActualizar().getBytes(StandardCharsets.UTF_8)));
+		request.setDatos(parametro);
+		log.info(" TERMINO - actualizaArticulor");
+		return request;
 	}
 
 }

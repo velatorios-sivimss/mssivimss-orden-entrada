@@ -1,9 +1,13 @@
 package com.imss.sivimss.orden.entrada.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -13,6 +17,7 @@ import com.google.gson.Gson;
 import com.imss.sivimss.orden.entrada.beans.CancelarCerrarOrdenEntrada;
 import com.imss.sivimss.orden.entrada.model.request.OrdenEntradaRequest;
 import com.imss.sivimss.orden.entrada.model.request.UsuarioDto;
+import com.imss.sivimss.orden.entrada.model.response.OrdenEntradaResponse;
 import com.imss.sivimss.orden.entrada.service.CancelarCerrarOrdenEntradaService;
 import com.imss.sivimss.orden.entrada.util.AppConstantes;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
@@ -35,9 +40,11 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 	private static final String MODIFICACION = "modificacion";
 	private static final String CONSULTA = "consulta";
 	
-	
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
+	
+	@Autowired 
+	private ModelMapper modelMapper;
 	
 	@Value("${endpoints.mod-catalogos}")
 	private String urlModCatalogos;
@@ -72,8 +79,18 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," actualizar inventario articulo ", MODIFICACION, authentication);
+				List<OrdenEntradaResponse> ordenEntradaResponse;
+				Response<Object> response = providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().consultarCantidadArticulo(request, ordenEntradaRequest).getDatos(),
+						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
+					ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
+					log.info(ordenEntradaResponse.get(0).getIdArticulo()+":"+ordenEntradaResponse.get(0).getCantidadUnidadArticulo()+":"+ordenEntradaResponse.get(0).getCantidadInventarioArticulo());
+					ordenEntradaRequest.setIdArticulo(ordenEntradaResponse.get(0).getIdArticulo());
+					ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
+					ordenEntradaRequest.setCantidadInventarioArticulo(ordenEntradaResponse.get(0).getCantidadInventarioArticulo());
 					return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicio(new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication));
-
+				}
+				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
             String consulta = new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));

@@ -80,17 +80,19 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," insertar orden entrada ", ALTA,authentication);
 				List<OrdenEntradaResponse> ordenEntradaResponse;
-				Response<Object> response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultaFolioOrdenEntrada(request, usuarioDto).getDatos(),
+				Response<Object> response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultaFolioOrdenEntrada(request, ordenEntradaRequest, usuarioDto).getDatos(),
 						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
-				if (response.getCodigo()==200) {
-					if (!response.getDatos().toString().contains("[]")) {
+				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
 						ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
 						ordenEntradaRequest.setIdOrdenEntrada(ordenEntradaResponse.get(0).getIdOrdenEntrada());
 						ordenEntradaRequest.setNumFolioOrdenEntrada(ordenEntradaResponse.get(0).getNumFolio());
 						ordenEntradaRequest.setIdInventarioArticulo(ordenEntradaResponse.get(0).getIdInventarioArticulo());
-						return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),
-								urlModCatalogos.concat("/crearMultiple"), authentication));
-					}
+						ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
+						response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),urlModCatalogos.concat("/crearMultiple"), authentication);
+						if(response.getCodigo()==200) {
+							return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().actualizaArticulor(ordenEntradaRequest, usuarioDto).getDatos(),urlModCatalogos.concat("/actualizar"), authentication));
+						}
+						
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {

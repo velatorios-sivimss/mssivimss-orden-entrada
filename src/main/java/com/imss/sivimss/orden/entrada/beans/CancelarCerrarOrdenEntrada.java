@@ -47,8 +47,25 @@ public class CancelarCerrarOrdenEntrada {
 		return request;
 	}
 	
+	public DatosRequest consultarCantidadArticulo(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
+		log.info(" INICIO - consultarCantidadArticulo");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("DISTINCT SA.ID_ARTICULO AS idArticulo"," SA.CAN_UNIDAD AS cantidadUnidadArticulo","COUNT(SOE.ID_ODE) AS cantidadInventarioArticulo")
+		.from("SVT_ARTICULO SA")
+		.innerJoin("SVT_INVENTARIO_ARTICULO SIA","SIA.ID_ARTICULO = SA.ID_ARTICULO")
+		.innerJoin("SVT_ORDEN_ENTRADA SOE", "SOE.ID_ODE = SIA.ID_ODE")
+		.and("SOE.ID_ODE= :idOrdenEntrada").setParameter("idOrdenEntrada", ordenEntradaRequest.getIdOrdenEntrada());
+		final String query = queryUtil.build();
+		log.info(" consultarCantidadArticulo: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - consultarCantidadArticulo");
+		return request;
+	}
+	
 	public ActualizarMultiRequest actualizarOrdenEntrada(OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
-		log.info(" INICIO - actualizarInventarioArticulo");
+		log.info(" INICIO - actualizarOrdenEntrada");
 		ActualizarMultiRequest actualizarMultiRequest = new ActualizarMultiRequest();
 		List<String> updates = new ArrayList<>();
 
@@ -59,7 +76,7 @@ public class CancelarCerrarOrdenEntrada {
 		q.addWhere("ID_ODE = " + ordenEntradaRequest.getIdOrdenEntrada());
 		
 		String query = q.obtenerQueryActualizar();
-		log.info(" actualizarInventarioArticulo: " + query);
+		log.info(" actualizarOrdenEntrada: " + query);
 		updates.add(DatatypeConverter.printBase64Binary(q.obtenerQueryActualizar().getBytes(StandardCharsets.UTF_8)));
 		actualizarMultiRequest.setUpdates(updates);
 		
@@ -70,11 +87,22 @@ public class CancelarCerrarOrdenEntrada {
 		q1.addWhere("ID_ODE = " + ordenEntradaRequest.getIdOrdenEntrada());
 		
 		String query1 = q1.obtenerQueryActualizar();
-		log.info(" actualizarOrdenEntrada: " + query1);
+		log.info(" actualizarInventarioArticulo: " + query1);
 		updates.add(DatatypeConverter.printBase64Binary(q1.obtenerQueryActualizar().getBytes(StandardCharsets.UTF_8)));
 		actualizarMultiRequest.setUpdates(updates);
 		
-		log.info(" TERMINO - actualizarInventarioArticulo");
+		final QueryHelper q2 = new QueryHelper("UPDATE SVT_ARTICULO");
+		q2.agregarParametroValues("CAN_UNIDAD", Integer.toString(ordenEntradaRequest.getCantidadUnidadArticulo()-ordenEntradaRequest.getCantidadInventarioArticulo()));
+		q2.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
+		q2.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q2.addWhere("ID_ARTICULO = " + ordenEntradaRequest.getIdArticulo());
+		
+		String query2 = q2.obtenerQueryActualizar();
+		log.info(" actualizarArticulo: " + query2);
+		updates.add(DatatypeConverter.printBase64Binary(q2.obtenerQueryActualizar().getBytes(StandardCharsets.UTF_8)));
+		actualizarMultiRequest.setUpdates(updates);
+		
+		log.info(" TERMINO - actualizarOrdenEntrada");
 		return actualizarMultiRequest;
 	}
 

@@ -19,9 +19,13 @@ public class OrdenEntradaRequest {
 	@JsonProperty
 	private Integer idInventarioArticulo;
 	@JsonProperty
+	private Integer cantidadInventarioArticulo;
+	@JsonProperty
 	private Integer numArticulo;
 	@JsonProperty
 	private String numFolioArticulo;
+	@JsonProperty
+	private Integer cantidadUnidadArticulo;
 	@JsonProperty
 	private Integer folioProveedor;
 	@JsonProperty
