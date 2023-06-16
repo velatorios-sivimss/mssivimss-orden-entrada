@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CancelarCerrarOrdenEntrada {
-	
+
 	public DatosRequest consultarDetalleOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest ) {
 		log.info(" INICIO - consultarDetalleOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -37,7 +37,7 @@ public class CancelarCerrarOrdenEntrada {
 				.innerJoin("SVC_VELATORIO V", "C.ID_VELATORIO = V.ID_VELATORIO").and("V.IND_ACTIVO = 1")
 				.innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SCA.ID_ARTICULO")
 				.innerJoin("SVC_CATEGORIA_ARTICULO CA", "CA.ID_CATEGORIA_ARTICULO  = A.ID_CATEGORIA_ARTICULO")
-				.where("OE.ID_ODE = :idOrdenEntrada").setParameter("idOrdenEntrada", ordenEntradaRequest.getIdOrdenEntrada()); 
+				.where("OE.ID_ODE = :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada()); 
 
 		final String query = queryUtil.build();
 		log.info(" consultarDetalleOrdenEntrada: " + query);
@@ -46,7 +46,6 @@ public class CancelarCerrarOrdenEntrada {
 		log.info(" TERMINO - consultarDetalleOrdenEntrada");
 		return request;
 	}
-	
 	public DatosRequest consultarCantidadArticulo(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
 		log.info(" INICIO - consultarCantidadArticulo");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -54,13 +53,28 @@ public class CancelarCerrarOrdenEntrada {
 		.from("SVT_ARTICULO SA")
 		.innerJoin("SVT_INVENTARIO_ARTICULO SIA","SIA.ID_ARTICULO = SA.ID_ARTICULO")
 		.innerJoin("SVT_ORDEN_ENTRADA SOE", "SOE.ID_ODE = SIA.ID_ODE")
-		.and("SOE.ID_ODE= :idOrdenEntrada").setParameter("idOrdenEntrada", ordenEntradaRequest.getIdOrdenEntrada());
+		.and("SOE.ID_ODE= :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada());
 		final String query = queryUtil.build();
 		log.info(" consultarCantidadArticulo: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
 		
 		log.info(" TERMINO - consultarCantidadArticulo");
+		return request;
+	}
+	
+	public DatosRequest verificaOrdenEntradaRelacionOrdenServicio(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
+		log.info(" INICIO - verificaOrdenEntradaRelacionOrdenServicio");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("COUNT(SIA.ID_INVE_ARTICULO) as cantidadInventarioArticulo").from("SVT_ORDEN_ENTRADA SOE")
+		.innerJoin("SVT_INVENTARIO_ARTICULO SIA","SOE.ID_ODE = SIA.ID_ODE").and("SIA.IND_ESTATUS = 1")
+		.where("SOE.ID_ODE= :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada());
+		final String query = queryUtil.build();
+		log.info(" verificaOrdenEntradaRelacionOrdenServicio: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - verificaOrdenEntradaRelacionOrdenServicio");
 		return request;
 	}
 	

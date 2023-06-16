@@ -12,5 +12,7 @@ public interface CancelarCerrarOrdenEntradaService {
 	Response<Object> consultarDetalleOrdenEntrada(DatosRequest request, Authentication authentication) throws IOException;
 	
 	Response<Object> actualizarOrdenEntrada(DatosRequest request, Authentication authentication) throws IOException;
+	
+	Response<Object> verificarOrdenEntradaRelacionOrdenServicio(DatosRequest request, Authentication authentication) throws IOException;
 
 }

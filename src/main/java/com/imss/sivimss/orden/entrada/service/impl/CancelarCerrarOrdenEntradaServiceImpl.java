@@ -100,4 +100,24 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
         }
 	}
 
+	@Override
+	public Response<Object> verificarOrdenEntradaRelacionOrdenServicio(DatosRequest request,
+			Authentication authentication) throws IOException {
+		OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
+		try {
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " verifica orden entrada relacion orden servicio ", CONSULTA, authentication);
+
+			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().verificaOrdenEntradaRelacionOrdenServicio(request, ordenEntradaRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
+
+		} catch (Exception e) {
+			String consulta = new CancelarCerrarOrdenEntrada().consultarDetalleOrdenEntrada(request, ordenEntradaRequest).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
 }

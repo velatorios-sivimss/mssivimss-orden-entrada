@@ -127,6 +127,15 @@ public class OrdenEntradaController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@PostMapping("/consulta-relacion-orden-entrada-servicio")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackGenerico")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> verificaOrdenEntradaRelacionOrdenServicio(@RequestBody DatosRequest request,Authentication authentication) throws IOException {
+		Response<Object> response =  cancelarCerrarOrdenEntradaService.verificarOrdenEntradaRelacionOrdenServicio(request, authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 	
 	/**
 	 * fallbacks generico
