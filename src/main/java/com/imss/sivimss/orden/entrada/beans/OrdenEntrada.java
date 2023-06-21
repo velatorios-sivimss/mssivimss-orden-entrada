@@ -155,7 +155,7 @@ public class OrdenEntrada {
 				"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
 		.from("SVT_ORDEN_ENTRADA SOE")
 		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SOE.ID_ODE = SIA.ID_ODE")
-		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, "SC.ID_CONTRATO = SOE.ID_CONTRATO")
+		.rightJoin(ConsultaConstantes.SVT_CONTRATO_SC, "SC.ID_CONTRATO = SOE.ID_CONTRATO")
 		.innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA,  ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
 		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
 		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
