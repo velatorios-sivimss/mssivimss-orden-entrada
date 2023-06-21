@@ -151,13 +151,17 @@ public class OrdenEntrada {
 	public DatosRequest consultarContratoCosto(DatosRequest request, ContratoRequest contrato) {
 		log.info(" INICIO - consultarContratoModelo");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("A.ID_ARTICULO AS ID_ARTICULO","SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
-		.from(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA)
-		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
+		queryUtil.select("SCA.NUM_CANTIDAD - COUNT(SIA.ID_ODE) AS NUM_CANTIDAD_DISPONIBLE","A.ID_ARTICULO AS ID_ARTICULO",
+				"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
+		.from("SVT_ORDEN_ENTRADA SOE")
+		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SOE.ID_ODE = SIA.ID_ODE")
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_SC, "SC.ID_CONTRATO = SOE.ID_CONTRATO")
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA,  ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
 		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
 		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
 		.where(ConsultaConstantes.SC_ID_CONTRATO_ID_CONTRATO).setParameter(ConsultaConstantes.ID_CONTRATO, contrato.getIdContrato())
-		.and("SCA.ID_ARTICULO = :idArticulo").setParameter("idArticulo", contrato.getIdArticulo());
+		.and("SCA.ID_ARTICULO = :idArticulo").setParameter("idArticulo", contrato.getIdArticulo()).and("CA.ID_CATEGORIA_ARTICULO = :idCategoriaArticulo")
+		.setParameter("idCategoriaArticulo", contrato.getIdCategoriaArticulo());
 		final String query = queryUtil.build();
 		log.info(" consultarContratoModelo: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
