@@ -61,6 +61,7 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			String consulta = new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -86,6 +87,7 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
+        	e.printStackTrace();
             String consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);

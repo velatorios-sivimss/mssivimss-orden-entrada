@@ -57,6 +57,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			String consulta = new ConsultaStock().consultarOrdenEntradaPorVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -77,6 +78,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			String consulta = new ConsultaStock().consultarDescripcionCategoria(request).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -98,6 +100,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			String consulta = new ConsultaStock().consultarTipoAsignacionArticulo(request).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -123,6 +126,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 			return MensajeResponseUtil.mensajeResponse(response,NO_SE_ENCONTRO_INFORMACION );
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
