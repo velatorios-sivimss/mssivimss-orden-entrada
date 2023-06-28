@@ -65,8 +65,8 @@ public class OrdenEntrada {
 	public DatosRequest consultaFolioOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
 		log.info(" INICIO - consultaFolioOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("(SELECT MAX(OE.ID_ODE) + 1 FROM SVT_ORDEN_ENTRADA OE ) AS idOrdenEntrada",
-				"CONCAT_WS('', (SELECT LPAD (MAX(OE.ID_ODE) + 1, 4, '0') FROM SVT_ORDEN_ENTRADA OE),'ODE',(SELECT SUBSTRING(SV.DES_VELATORIO,1,3) AS DESVELATORIO FROM SVC_VELATORIO SV WHERE SV.ID_VELATORIO = "+usuarioDto.getIdVelatorio()+")) AS numFolio",
+		queryUtil.select("(SELECT IFNULL(MAX(OE.ID_ODE),0) + 1 FROM SVT_ORDEN_ENTRADA OE ) AS idOrdenEntrada",
+				"CONCAT_WS('', (SELECT LPAD (IFNULL(MAX(OE.ID_ODE),0) + 1, 4, '0') FROM SVT_ORDEN_ENTRADA OE),'ODE',(SELECT SUBSTRING(SV.DES_VELATORIO,1,3) AS DESVELATORIO FROM SVC_VELATORIO SV WHERE SV.ID_VELATORIO = "+usuarioDto.getIdVelatorio()+")) AS numFolio",
 				"(SELECT MAX(IA.ID_INVE_ARTICULO) FROM SVT_INVENTARIO_ARTICULO IA ) AS idInventarioArticulo",
 				"(SELECT A.CAN_UNIDAD FROM SVT_ARTICULO A WHERE A.ID_ARTICULO = "+ordenEntradaRequest.getIdArticulo()+" ) AS cantidadUnidadArticulo")
 		.from("DUAL");
@@ -82,7 +82,7 @@ public class OrdenEntrada {
 		log.info(" INICIO - consultarOrdenEntradaPorVelatorio");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("C.ID_CONTRATO AS ID_CONTRATO","C.NUM_CONTRATO AS NUM_CONTRATO").from("SVT_CONTRATO C")
-		.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = C.ID_VELATORIO").where("C.ID_TIPO_ASIGNACION = 2").and("C.ID_TIPO_CONTRATO = 2")
+		.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = C.ID_VELATORIO").where("C.ID_TIPO_ASIGNACION = 2").and("C.ID_TIPO_CONTRATO = 1")
 		.and("C.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
 		final String query = queryUtil.build();
 		log.info(" consultarOrdenEntradaPorVelatorio: " + query );

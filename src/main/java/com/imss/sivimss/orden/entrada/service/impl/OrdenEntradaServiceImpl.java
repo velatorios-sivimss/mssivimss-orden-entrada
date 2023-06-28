@@ -87,7 +87,7 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 						ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
 						ordenEntradaRequest.setIdOrdenEntrada(ordenEntradaResponse.get(0).getIdOrdenEntrada());
 						ordenEntradaRequest.setNumFolioOrdenEntrada(ordenEntradaResponse.get(0).getNumFolio());
-						ordenEntradaRequest.setIdInventarioArticulo(ordenEntradaResponse.get(0).getIdInventarioArticulo());
+						ordenEntradaRequest.setIdInventarioArticulo(ordenEntradaResponse.get(0).getIdInventarioArticulo()!= null?ordenEntradaResponse.get(0).getIdInventarioArticulo():1);
 						ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
 						response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),urlModCatalogos.concat("/crearMultiple"), authentication);
 						if(response.getCodigo()==200) {
