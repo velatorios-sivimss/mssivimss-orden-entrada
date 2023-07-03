@@ -20,46 +20,54 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrdenEntrada {
 
-	public DatosRequest consultarOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {
+	public DatosRequest consultarOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, String formatoFecha) {
 		log.info(" INICIO - consultarOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("OE.ID_ODE AS ID_ODE", "OE.NUM_FOLIO AS NUM_FOLIO_ODE", "C.DES_CONTRATO AS DES_CONTRATO",
-						"P.NOM_PROVEEDOR AS NOM_PROVEEDOR", "P.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
+				.select("DISTINCT  SOE.ID_ODE AS ID_ODE", "SOE.NUM_FOLIO AS NUM_FOLIO_ODE", "SC.DES_CONTRATO AS DES_CONTRATO",
+						"SP.NOM_PROVEEDOR AS NOM_PROVEEDOR", "SP.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
 						"CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
-						"A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "V.DES_VELATORIO AS DES_VELATORIO",
+						"SA.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "SV.DES_VELATORIO AS DES_VELATORIO",
 						"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO", "SCA.MON_PRECIO AS MON_PRECIO",
-						"OE.NUM_ARTICULO AS NUM_ARTICULO", "OE.FEC_INGRESO AS FEC_ODE",
-						"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA")
-				.from("SVT_ORDEN_ENTRADA OE").innerJoin("SVT_CONTRATO C", "OE.ID_CONTRATO = C.ID_CONTRATO")
-				.and("C.FEC_FIN_VIG IS NULL").innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA, "C.ID_CONTRATO = SCA.ID_CONTRATO")
-				.innerJoin("SVT_PROVEEDOR P", "C.ID_PROVEEDOR = P.ID_PROVEEDOR").and("P.IND_ACTIVO = 1")
-				.innerJoin("SVC_VELATORIO V", "C.ID_VELATORIO = V.ID_VELATORIO").and("V.IND_ACTIVO = 1")
-				.innerJoin(ConsultaConstantes.SVT_ARTICULO_A,ConsultaConstantes. A_ID_ARTICULO_SCA_ID_ARTICULO)
-				.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, "CA.ID_CATEGORIA_ARTICULO  = A.ID_CATEGORIA_ARTICULO");
+						"SOE.NUM_ARTICULO AS NUM_ARTICULO", "DATE_FORMAT(SOE.FEC_INGRESO,'"+ formatoFecha+"') AS FEC_ODE",
+						"SOE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA")
+				.from("SVT_ORDEN_ENTRADA SOE")
+				.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SIA.ID_ODE = SOE.ID_ODE")
+				.innerJoin("SVT_CONTRATO SC", "SC.ID_CONTRATO = SOE.ID_CONTRATO").and("SC.IND_ACTIVO = 1")
+				.innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA, "SC.ID_CONTRATO = SCA.ID_CONTRATO").and("SIA.ID_ARTICULO = SCA.ID_ARTICULO")
+				.innerJoin("SVT_PROVEEDOR SP", "SC.ID_PROVEEDOR = SP.ID_PROVEEDOR").and("SP.IND_ACTIVO = 1")
+				.innerJoin("SVC_VELATORIO SV", "SC.ID_VELATORIO = SV.ID_VELATORIO").and("SV.IND_ACTIVO = 1")
+				.innerJoin("SVT_ARTICULO SA","SA.ID_ARTICULO = SCA.ID_ARTICULO")
+				.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, "CA.ID_CATEGORIA_ARTICULO  = SA.ID_CATEGORIA_ARTICULO")
+				.where("IFNULL(SOE.ID_ODE,0) > 0");
 		
-		if(usuarioDto.getIdVelatorio() != null) {
-			queryUtil.where("C.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
-		}
 		
-		if (ordenEntradaRequest.getNumFolioOrdenEntrada() != null) {
-		 queryUtil.and("OE.NUM_FOLIO = :numFolioOrdenEntrada").setParameter("numFolioOrdenEntrada", ordenEntradaRequest.getNumFolioOrdenEntrada()); 
-		 }
-		 
-		if (ordenEntradaRequest.getNomProveedor() != null) {
-			queryUtil.and("P.NOM_PROVEEDOR = :nomProveedor").setParameter("nomProveedor",ordenEntradaRequest.getNomProveedor());
-		}
-		if (ordenEntradaRequest.getFechaInicio() != null && ordenEntradaRequest.getFechaFin() != null) {
-			queryUtil.and("OE.FEC_INGRESO >= :fecInicio")
-					.setParameter("fecInicio", ordenEntradaRequest.getFechaInicio()).and("OE.FEC_INGRESO <= :fecFin")
-					.setParameter("fecFin", ordenEntradaRequest.getFechaFin());
-		}
-		final String query = queryUtil.build();
+		final String query = condicioordenEntradan(ordenEntradaRequest, queryUtil).build();
 		log.info(" consultarOrdenEntrada: " + query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
 		log.info(" TERMINO - consultarOrdenEntrada");
 		return request;
+	}
+
+	private SelectQueryUtil condicioordenEntradan(OrdenEntradaRequest ordenEntradaRequest, SelectQueryUtil queryUtil) {
+		if(ordenEntradaRequest.getIdVelatorio() != null) {
+			queryUtil.and("SC.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(ordenEntradaRequest.getIdVelatorio()));
+		}
+		
+		if (ordenEntradaRequest.getNumFolioOrdenEntrada() != null) {
+		 queryUtil.and("SOE.NUM_FOLIO = :numFolioOrdenEntrada").setParameter("numFolioOrdenEntrada", ordenEntradaRequest.getNumFolioOrdenEntrada()); 
+		 }
+		 
+		if (ordenEntradaRequest.getNomProveedor() != null) {
+			queryUtil.and("SP.NOM_PROVEEDOR = :nomProveedor").setParameter("nomProveedor",ordenEntradaRequest.getNomProveedor());
+		}
+		if (ordenEntradaRequest.getFechaInicio() != null && ordenEntradaRequest.getFechaFin() != null) {
+			queryUtil.and("SOE.FEC_INGRESO >= :fecInicio")
+					.setParameter("fecInicio", ordenEntradaRequest.getFechaInicio()).and("SOE.FEC_INGRESO <= :fecFin")
+					.setParameter("fecFin", ordenEntradaRequest.getFechaFin());
+		}
+		return queryUtil;
 	}
 	
 	public DatosRequest consultaFolioOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, UsuarioDto usuarioDto) {

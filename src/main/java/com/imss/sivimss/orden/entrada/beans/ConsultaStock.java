@@ -56,15 +56,19 @@ public class ConsultaStock {
 		return request;
 	}
 	
-	public DatosRequest consultarStock(DatosRequest request, ConsultaStockRequest consultaStockRequest, UsuarioDto usuarioDto) {
+	public DatosRequest consultarStock(DatosRequest request, ConsultaStockRequest consultaStockRequest,  String formatoFecha) {
 		log.info(" INICIO - consultarStock");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("OE.FEC_INGRESO AS FEC_ODE","OE.NUM_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
-				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_ORDEN_ENTRADA OE")
-		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)")
+		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.NUM_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
+				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_INVENTARIO_ARTICULO SIA")
+		.innerJoin("SVT_ORDEN_ENTRADA OE", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)")
 		.innerJoin("SVT_ARTICULO A","A.ID_ARTICULO = SIA.ID_ARTICULO")
 		.innerJoin("SVC_CATEGORIA_ARTICULO CA", "A.ID_CATEGORIA_ARTICULO  = CA.ID_CATEGORIA_ARTICULO")
-		.where("SIA.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
+		.where("IFNULL(SIA.ID_INVE_ARTICULO ,0) > 0");
+		
+		if (consultaStockRequest.getIdVelatorio() != null) {
+			queryUtil.and("SIA.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(consultaStockRequest.getIdVelatorio()));
+		}
 		
 		if (consultaStockRequest.getIdOrdenEntrada() != null) {
 			queryUtil.and("OE.ID_ODE = :idOrdenEntrada").setParameter("idOrdenEntrada", consultaStockRequest.getIdOrdenEntrada());

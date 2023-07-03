@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class RealizarDevolucionServiceImpl implements RealizarDevolucionService {
 	
+	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
@@ -57,8 +58,8 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
 			e.printStackTrace();

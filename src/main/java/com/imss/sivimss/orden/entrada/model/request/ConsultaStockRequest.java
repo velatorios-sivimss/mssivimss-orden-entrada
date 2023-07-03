@@ -8,6 +8,8 @@ import lombok.Data;
 public class ConsultaStockRequest{
 	
 	@JsonProperty
+	private Integer idVelatorio;
+	@JsonProperty
 	private Integer idOrdenEntrada;
 	@JsonProperty
 	private Integer idCategoriaArticulo;

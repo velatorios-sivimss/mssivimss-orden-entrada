@@ -13,6 +13,8 @@ public class OrdenEntradaRequest {
 	@JsonProperty
 	private String numFolioOrdenEntrada;
 	@JsonProperty
+	private Integer idVelatorio;
+	@JsonProperty
 	private Integer idContrato;
 	@JsonProperty
 	private Integer idArticulo;

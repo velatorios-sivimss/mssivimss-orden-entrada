@@ -33,8 +33,7 @@ public class MensajeResponseUtil {
 	}
 	
 	public  static Response<Object>mensajeConsultaResponse(Response<Object> respuestaGenerado, String numeroMensaje) {
-		Integer codigo = respuestaGenerado.getCodigo();
-		if (codigo == 200 &&  (!respuestaGenerado.getDatos().toString().contains("ID"))){
+		if (respuestaGenerado.getCodigo()==200 && respuestaGenerado.getDatos().toString().contains("[]")){
 			respuestaGenerado.setMensaje(numeroMensaje);
 		}
 		return respuestaGenerado;

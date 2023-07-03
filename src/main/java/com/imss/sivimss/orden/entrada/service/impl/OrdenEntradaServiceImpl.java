@@ -52,6 +52,9 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 	
 	@Autowired
 	private LogUtil logUtil;
+	
+	@Value("${formato_fecha}")
+	private String formatoFecha;
 
 	@Override
 	public Response<Object> consultarContratoProveedor(DatosRequest request, Authentication authentication)
@@ -110,16 +113,15 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 	public Response<Object> consultarOrdenEntrada(DatosRequest request, Authentication authentication)
 			throws IOException {
 		OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
-		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar orden entrada ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarOrdenEntrada(request, ordenEntradaRequest, usuarioDto).getDatos(),
+			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultarOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			String consulta = new OrdenEntrada().consultarOrdenEntrada(request, ordenEntradaRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			String consulta = new OrdenEntrada().consultarOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,

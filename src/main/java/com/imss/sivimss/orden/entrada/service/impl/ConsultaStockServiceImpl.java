@@ -44,6 +44,8 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	@Autowired
 	private LogUtil logUtil;
 	
+	@Value("${formato_fecha}")
+	private String formatoFecha;
 
 	@Override
 	public Response<Object> consultarOrdenEntradaPorVelatorio(DatosRequest request, Authentication authentication)
@@ -113,11 +115,10 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	@Override
 	public Response<Object> consultarStock(DatosRequest request, Authentication authentication) throws IOException {
 		ConsultaStockRequest consultaStockRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ConsultaStockRequest.class);
-		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar stock", CONSULTA, authentication);
 			
-			Response<Object> response = providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos(),
+			Response<Object> response = providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
 			if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
 				return MensajeResponseUtil.mensajeResponseObject(response);
@@ -127,7 +128,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,

@@ -20,24 +20,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CancelarCerrarOrdenEntrada {
 
-	public DatosRequest consultarDetalleOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest ) {
+	
+	
+
+	public DatosRequest consultarDetalleOrdenEntrada(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest, String formatoFecha ) {
 		log.info(" INICIO - consultarDetalleOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("OE.ID_ODE AS ID_ODE", "OE.NUM_FOLIO AS NUM_FOLIO_ODE", "C.DES_CONTRATO AS DES_CONTRATO",
-						"P.NOM_PROVEEDOR AS NOM_PROVEEDOR", "P.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
-						"CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
-						"A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "V.DES_VELATORIO AS DES_VELATORIO",
-						"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO", "SCA.MON_PRECIO AS MON_PRECIO",
-						"OE.NUM_ARTICULO AS NUM_ARTICULO", "OE.FEC_INGRESO AS FEC_ODE",
-						"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA")
-				.from("SVT_ORDEN_ENTRADA OE").innerJoin("SVT_CONTRATO C", "OE.ID_CONTRATO = C.ID_CONTRATO")
-				.and("C.FEC_FIN_VIG IS NULL").innerJoin("SVT_CONTRATO_ARTICULOS SCA", "C.ID_CONTRATO = SCA.ID_CONTRATO")
-				.innerJoin("SVT_PROVEEDOR P", "C.ID_PROVEEDOR = P.ID_PROVEEDOR").and("P.IND_ACTIVO = 1")
-				.innerJoin("SVC_VELATORIO V", "C.ID_VELATORIO = V.ID_VELATORIO").and("V.IND_ACTIVO = 1")
-				.innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SCA.ID_ARTICULO")
-				.innerJoin("SVC_CATEGORIA_ARTICULO CA", "CA.ID_CATEGORIA_ARTICULO  = A.ID_CATEGORIA_ARTICULO")
-				.where("OE.ID_ODE = :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada()); 
+		.select("DISTINCT  SOE.ID_ODE AS ID_ODE", "SOE.NUM_FOLIO AS NUM_FOLIO_ODE", "SC.DES_CONTRATO AS DES_CONTRATO",
+				"SP.NOM_PROVEEDOR AS NOM_PROVEEDOR", "SP.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
+				"CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
+				"SA.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "SV.DES_VELATORIO AS DES_VELATORIO",
+				"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO", "SCA.MON_PRECIO AS MON_PRECIO",
+				"SOE.NUM_ARTICULO AS NUM_ARTICULO", "DATE_FORMAT(SOE.FEC_INGRESO,'"+ formatoFecha+"') AS FEC_ODE",
+				"SOE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA")
+		.from(ConsultaConstantes.SVT_ORDEN_ENTRADA_SOE)
+		.innerJoin(ConsultaConstantes.SVT_INVENTARIO_ARTICULO_SIA, "SIA.ID_ODE = SOE.ID_ODE")
+		.innerJoin("SVT_CONTRATO SC", "SC.ID_CONTRATO = SOE.ID_CONTRATO").and("SC.IND_ACTIVO = 1")
+		.innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA, "SC.ID_CONTRATO = SCA.ID_CONTRATO").and("SIA.ID_ARTICULO = SCA.ID_ARTICULO")
+		.innerJoin("SVT_PROVEEDOR SP", "SC.ID_PROVEEDOR = SP.ID_PROVEEDOR").and("SP.IND_ACTIVO = 1")
+		.innerJoin("SVC_VELATORIO SV", "SC.ID_VELATORIO = SV.ID_VELATORIO").and("SV.IND_ACTIVO = 1")
+		.innerJoin("SVT_ARTICULO SA","SA.ID_ARTICULO = SCA.ID_ARTICULO")
+		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, "CA.ID_CATEGORIA_ARTICULO  = SA.ID_CATEGORIA_ARTICULO")
+		.where("IFNULL(SOE.ID_ODE,0) > 0")
+		.and("SOE.ID_ODE = :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada()); 
 
 		final String query = queryUtil.build();
 		log.info(" consultarDetalleOrdenEntrada: " + query);
@@ -51,8 +57,8 @@ public class CancelarCerrarOrdenEntrada {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DISTINCT SA.ID_ARTICULO AS idArticulo"," SA.CAN_UNIDAD AS cantidadUnidadArticulo","COUNT(SOE.ID_ODE) AS cantidadInventarioArticulo")
 		.from("SVT_ARTICULO SA")
-		.innerJoin("SVT_INVENTARIO_ARTICULO SIA","SIA.ID_ARTICULO = SA.ID_ARTICULO")
-		.innerJoin("SVT_ORDEN_ENTRADA SOE", "SOE.ID_ODE = SIA.ID_ODE")
+		.innerJoin(ConsultaConstantes.SVT_INVENTARIO_ARTICULO_SIA,"SIA.ID_ARTICULO = SA.ID_ARTICULO")
+		.innerJoin(ConsultaConstantes.SVT_ORDEN_ENTRADA_SOE, "SOE.ID_ODE = SIA.ID_ODE")
 		.and("SOE.ID_ODE= :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada());
 		final String query = queryUtil.build();
 		log.info(" consultarCantidadArticulo: " + query );
@@ -66,8 +72,8 @@ public class CancelarCerrarOrdenEntrada {
 	public DatosRequest verificaOrdenEntradaRelacionOrdenServicio(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
 		log.info(" INICIO - verificaOrdenEntradaRelacionOrdenServicio");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("COUNT(SIA.ID_INVE_ARTICULO) as cantidadInventarioArticulo").from("SVT_ORDEN_ENTRADA SOE")
-		.innerJoin("SVT_INVENTARIO_ARTICULO SIA","SOE.ID_ODE = SIA.ID_ODE").and("SIA.IND_ESTATUS = 1")
+		queryUtil.select("COUNT(SIA.ID_INVE_ARTICULO) as cantidadInventarioArticulo").from(ConsultaConstantes.SVT_ORDEN_ENTRADA_SOE)
+		.innerJoin(ConsultaConstantes.SVT_INVENTARIO_ARTICULO_SIA,"SOE.ID_ODE = SIA.ID_ODE").and("SIA.IND_ESTATUS = 1")
 		.where("SOE.ID_ODE= :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada());
 		final String query = queryUtil.build();
 		log.info(" verificaOrdenEntradaRelacionOrdenServicio: " + query );
