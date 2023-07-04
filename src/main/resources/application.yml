@@ -26,15 +26,15 @@ logging:
 endpoints:
    mod-catalogos: http://localhost:8094/mssivimss-mod-catalogos/v1/generico
    ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
-   
-   
-plantilla:
-  ejemplo-plantilla: reportes/plantilla/ControlSalidaDonacion.jrxml
+
+reporte:
+   consulta-orden-entrada: reportes/generales/CONSULTA_ORDEN_ENTRADA.jrxml
+   consulta-stock: reportes/generales/CONSULTA_STOCK.jrxml   
 
 jwt:
   secretkey-flujo: funcionamuybien
   secretkey-dominios: funcionamuybiendominio
-  expiration-milliseconds: 360
+  expiration-milliseconds: 36000
   
 management:
       endpoints:

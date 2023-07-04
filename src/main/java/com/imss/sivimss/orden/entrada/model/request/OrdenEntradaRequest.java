@@ -42,5 +42,8 @@ public class OrdenEntradaRequest {
 	private String fechaFin;
 	@JsonProperty
 	private Integer indEstatus;
+	@JsonProperty
+	private String tipoReporte;
+	private Double version =5.2D;
 
 }

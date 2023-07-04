@@ -90,5 +90,25 @@ public class ConsultaStock {
 		return request;
 		
 	}
+	
+	public String condicionconsultarStocka(ConsultaStockRequest consultaStockRequest) {
+		StringBuilder query =new StringBuilder();
+		if(consultaStockRequest.getIdVelatorio() != null) {
+			query.append(" AND SIA.ID_VELATORIO = ").append(ConsultaConstantes.getIdVelatorio(consultaStockRequest.getIdVelatorio()));
+		}
+		
+		if (consultaStockRequest.getIdOrdenEntrada() != null) {
+			query.append(" AND OE.ID_ODE = ").append(consultaStockRequest.getIdOrdenEntrada());
+		 }
+		 
+		if (consultaStockRequest.getIdCategoriaArticulo() != null) {
+			query.append(" AND CA.ID_CATEGORIA_ARTICULO = ").append(consultaStockRequest.getIdCategoriaArticulo());
+		}
+		
+		if (consultaStockRequest.getIdTipoAsignacionArt() != null) {
+			query.append(" AND SIA.ID_TIPO_ASIGNACION_ART = ").append(consultaStockRequest.getIdTipoAsignacionArt());
+		}
+		return query.toString();
+	}
 
 }
