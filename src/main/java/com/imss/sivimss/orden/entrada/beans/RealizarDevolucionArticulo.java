@@ -58,6 +58,7 @@ public class RealizarDevolucionArticulo {
 		final QueryHelper q = new QueryHelper("UPDATE SVT_INVENTARIO_ARTICULO ");
 		q.agregarParametroValues("IND_DEVOLUCION", String.valueOf(1));
 		q.agregarParametroValues("DES_MOTIVO_DEVOLUCION", "'" + inventarioArticuloRequest.getDesMotivoDevolucion() +"'");
+		q.agregarParametroValues("IND_ESTATUS", String.valueOf(0));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
 		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
 		q.addWhere("ID_INVE_ARTICULO = " + inventarioArticuloRequest.getIdInventarioArticulo());

@@ -234,7 +234,7 @@ public class OrdenEntrada {
 			q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
 			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);
 			q.agregarParametroValues("ID_VELATORIO", String.valueOf(usuarioDto.getIdVelatorio()));
-			q.agregarParametroValues("IND_ESTATUS", String.valueOf(0));
+			q.agregarParametroValues("IND_ESTATUS", String.valueOf(1));
 			query.append("$$").append(q.obtenerQueryInsertar());
 		}
 		log.info(" TERMINO - insertInventarioArticulo");
