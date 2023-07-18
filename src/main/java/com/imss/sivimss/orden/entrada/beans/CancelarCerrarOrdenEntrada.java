@@ -71,11 +71,18 @@ public class CancelarCerrarOrdenEntrada {
 	
 	public DatosRequest verificaOrdenEntradaRelacionOrdenServicio(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
 		log.info(" INICIO - verificaOrdenEntradaRelacionOrdenServicio");
-		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("COUNT(SIA.ID_INVE_ARTICULO) as cantidadInventarioArticulo").from(ConsultaConstantes.SVT_ORDEN_ENTRADA_SOE)
-		.innerJoin(ConsultaConstantes.SVT_INVENTARIO_ARTICULO_SIA,"SOE.ID_ODE = SIA.ID_ODE").and("SIA.IND_ESTATUS = 1")
-		.where("SOE.ID_ODE= :idOrdenEntrada").setParameter(ConsultaConstantes.ID_ORDEN_ENTRADA, ordenEntradaRequest.getIdOrdenEntrada());
-		final String query = queryUtil.build();
+		SelectQueryUtil selectQueryUtilUnion= new SelectQueryUtil();
+		SelectQueryUtil selectQueryUtilUnionTemp= new SelectQueryUtil();
+		
+		selectQueryUtilUnion.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARACTERISTICAS_PRESUPUESTO SDCP")
+		.where("ID_INVE_ARTICULO  IN (SELECT SIA.ID_INVE_ARTICULO  FROM SVT_ORDEN_ENTRADA SOE INNER JOIN SVT_INVENTARIO_ARTICULO SIA".concat(
+				" ON SOE.ID_ODE = SIA.ID_ODE WHERE SOE.ID_ODE = "+ordenEntradaRequest.getIdOrdenEntrada()+")")).and("SDCP.IND_ACTIVO=1");
+		
+		selectQueryUtilUnionTemp.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARACTERISTICAS_PRESUPUESTO_TEMP SDCPT")
+		.where("ID_INVE_ARTICULO  IN (SELECT SIA.ID_INVE_ARTICULO  FROM SVT_ORDEN_ENTRADA SOE INNER JOIN SVT_INVENTARIO_ARTICULO SIA".concat(
+				" ON SOE.ID_ODE = SIA.ID_ODE WHERE SOE.ID_ODE = "+ordenEntradaRequest.getIdOrdenEntrada()+")")).and("SDCPT.IND_ACTIVO=1");
+		
+		final String query = selectQueryUtilUnion.union(selectQueryUtilUnionTemp);
 		log.info(" verificaOrdenEntradaRelacionOrdenServicio: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
