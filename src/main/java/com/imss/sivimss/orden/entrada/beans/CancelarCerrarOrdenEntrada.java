@@ -71,18 +71,30 @@ public class CancelarCerrarOrdenEntrada {
 	
 	public DatosRequest verificaOrdenEntradaRelacionOrdenServicio(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
 		log.info(" INICIO - verificaOrdenEntradaRelacionOrdenServicio");
-		SelectQueryUtil selectQueryUtilUnion= new SelectQueryUtil();
 		SelectQueryUtil selectQueryUtilUnionTemp= new SelectQueryUtil();
 		
-		selectQueryUtilUnion.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARACTERISTICAS_PRESUPUESTO SDCP")
-		.where("ID_INVE_ARTICULO  IN (SELECT SIA.ID_INVE_ARTICULO  FROM SVT_ORDEN_ENTRADA SOE INNER JOIN SVT_INVENTARIO_ARTICULO SIA".concat(
-				" ON SOE.ID_ODE = SIA.ID_ODE WHERE SOE.ID_ODE = "+ordenEntradaRequest.getIdOrdenEntrada()+")")).and("SDCP.IND_ACTIVO=1");
-		
-		selectQueryUtilUnionTemp.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARACTERISTICAS_PRESUPUESTO_TEMP SDCPT")
+		selectQueryUtilUnionTemp.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARAC_PRESUP_TEMP SDCPT")
 		.where("ID_INVE_ARTICULO  IN (SELECT SIA.ID_INVE_ARTICULO  FROM SVT_ORDEN_ENTRADA SOE INNER JOIN SVT_INVENTARIO_ARTICULO SIA".concat(
 				" ON SOE.ID_ODE = SIA.ID_ODE WHERE SOE.ID_ODE = "+ordenEntradaRequest.getIdOrdenEntrada()+")")).and("SDCPT.IND_ACTIVO=1");
 		
-		final String query = selectQueryUtilUnion.union(selectQueryUtilUnionTemp);
+		final String query = selectQueryUtilUnionTemp.build();
+		log.info(" verificaOrdenEntradaRelacionOrdenServicio: " + query );
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		
+		log.info(" TERMINO - verificaOrdenEntradaRelacionOrdenServicio");
+		return request;
+	}
+	
+	public DatosRequest verificaOrdenEntradaRelacionOrdenServicio2(DatosRequest request,OrdenEntradaRequest ordenEntradaRequest ) {
+		log.info(" INICIO - verificaOrdenEntradaRelacionOrdenServicio");
+		SelectQueryUtil selectQueryUtilUnion= new SelectQueryUtil();
+		
+		selectQueryUtilUnion.select("COUNT(*) AS cantidadInventarioArticulo").from("SVC_DETALLE_CARAC_PRESUP SDCP")
+		.where("ID_INVE_ARTICULO  IN (SELECT SIA.ID_INVE_ARTICULO  FROM SVT_ORDEN_ENTRADA SOE INNER JOIN SVT_INVENTARIO_ARTICULO SIA".concat(
+				" ON SOE.ID_ODE = SIA.ID_ODE WHERE SOE.ID_ODE = "+ordenEntradaRequest.getIdOrdenEntrada()+")")).and("SDCP.IND_ACTIVO=1");
+		
+		final String query = selectQueryUtilUnion.build();
 		log.info(" verificaOrdenEntradaRelacionOrdenServicio: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);

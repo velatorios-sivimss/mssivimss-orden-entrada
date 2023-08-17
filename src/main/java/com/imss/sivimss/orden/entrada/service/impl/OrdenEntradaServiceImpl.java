@@ -67,7 +67,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarContratoProveedor(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -100,7 +99,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
-        	e.printStackTrace();
             String consulta = new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -120,7 +118,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -142,7 +139,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarContratoPorVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -163,7 +159,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarContratoCategoria(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -184,7 +179,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarContratoModelo(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -205,7 +199,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new OrdenEntrada().consultarContratoCosto(request, contratoRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);

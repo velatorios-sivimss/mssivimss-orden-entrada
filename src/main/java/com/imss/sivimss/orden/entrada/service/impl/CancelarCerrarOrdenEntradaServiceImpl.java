@@ -32,9 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrdenEntradaService {
 	
-	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu
+	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu busqueda
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
+	private static final String NO_ES_POSIBLE_CANCELAR = "184"; // No se encontró información relacionada a tu
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
 	private static final String CONSULTA_GENERICA = "/consulta";
 	private static final String MODIFICACION = "modificacion";
@@ -66,7 +67,6 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new CancelarCerrarOrdenEntrada().consultarDetalleOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -96,7 +96,6 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
-        	e.printStackTrace();
             String consulta = new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
@@ -111,12 +110,26 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 		OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " verifica orden entrada relacion orden servicio ", CONSULTA, authentication);
-
-			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().verificaOrdenEntradaRelacionOrdenServicio(request, ordenEntradaRequest).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
-
+			List<OrdenEntradaResponse> ordenEntradaResponse;
+			Response<Object> response = providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().verificaOrdenEntradaRelacionOrdenServicio(request, ordenEntradaRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+			if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
+				ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
+				if(ordenEntradaResponse.get(0).getCantidadInventarioArticulo() == 0) {
+					response = providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().verificaOrdenEntradaRelacionOrdenServicio2(request, ordenEntradaRequest).getDatos(),
+							urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+					if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
+						ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
+						if(ordenEntradaResponse.get(0).getCantidadInventarioArticulo() == 0) {
+							return MensajeResponseUtil.mensajeResponse (response,NO_SE_ENCONTRO_INFORMACION);
+						}
+						return MensajeResponseUtil.mensajeResponse (response,NO_ES_POSIBLE_CANCELAR);
+					}
+				}
+				return MensajeResponseUtil.mensajeResponse (response,NO_ES_POSIBLE_CANCELAR);
+			}
+			return MensajeResponseUtil.mensajeResponse (response,NO_SE_ENCONTRO_INFORMACION);
 		} catch (Exception e) {
-			e.printStackTrace();
 			String consulta = new CancelarCerrarOrdenEntrada().verificaOrdenEntradaRelacionOrdenServicio(request, ordenEntradaRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
