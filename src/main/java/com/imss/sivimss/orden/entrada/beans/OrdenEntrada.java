@@ -24,7 +24,7 @@ public class OrdenEntrada {
 		log.info(" INICIO - consultarOrdenEntrada");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("DISTINCT  SOE.ID_ODE AS ID_ODE", "SOE.NUM_FOLIO AS NUM_FOLIO_ODE", "SC.DES_CONTRATO AS DES_CONTRATO",
+				.select("DISTINCT  SOE.ID_ODE AS ID_ODE", "SOE.CVE_FOLIO AS NUM_FOLIO_ODE", "SC.DES_CONTRATO AS DES_CONTRATO",
 						"SP.NOM_PROVEEDOR AS NOM_PROVEEDOR", "SP.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
 						"CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
 						"SA.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "SV.DES_VELATORIO AS DES_VELATORIO",
@@ -46,7 +46,7 @@ public class OrdenEntrada {
 				}
 				
 				if (ordenEntradaRequest.getNumFolioOrdenEntrada() != null) {
-				 queryUtil.and("SOE.NUM_FOLIO = :numFolioOrdenEntrada").setParameter("numFolioOrdenEntrada", ordenEntradaRequest.getNumFolioOrdenEntrada()); 
+				 queryUtil.and("SOE.CVE_FOLIO = :numFolioOrdenEntrada").setParameter("numFolioOrdenEntrada", ordenEntradaRequest.getNumFolioOrdenEntrada()); 
 				 }
 				 
 				if (ordenEntradaRequest.getNomProveedor() != null) {
@@ -73,7 +73,7 @@ public class OrdenEntrada {
 		}
 		
 		if (ordenEntradaRequest.getNumFolioOrdenEntrada() != null) {
-			query.append(" AND SOE.NUM_FOLIO = '").append(ordenEntradaRequest.getNumFolioOrdenEntrada()).append("'");
+			query.append(" AND SOE.CVE_FOLIO = '").append(ordenEntradaRequest.getNumFolioOrdenEntrada()).append("'");
 		 }
 		 
 		if (ordenEntradaRequest.getNomProveedor() != null) {
@@ -201,7 +201,7 @@ public class OrdenEntrada {
 		Map<String, Object> parametro = new HashMap<>();
 		final QueryHelper q = new QueryHelper("INSERT INTO SVT_ORDEN_ENTRADA");
 		q.agregarParametroValues("ID_ODE", String.valueOf(ordenEntradaRequest.getIdOrdenEntrada()));
-		q.agregarParametroValues("NUM_FOLIO", "'" + ordenEntradaRequest.getNumFolioOrdenEntrada() + "'");
+		q.agregarParametroValues("CVE_FOLIO", "'" + ordenEntradaRequest.getNumFolioOrdenEntrada() + "'");
 		q.agregarParametroValues("ID_CONTRATO", String.valueOf(ordenEntradaRequest.getIdContrato()));
 		q.agregarParametroValues("NUM_ARTICULO", String.valueOf(ordenEntradaRequest.getNumArticulo()));
 		q.agregarParametroValues("FEC_INGRESO", "'" + ordenEntradaRequest.getFecIngreso() + "'");
@@ -229,7 +229,7 @@ public class OrdenEntrada {
 			final QueryHelper q = new QueryHelper("INSERT INTO SVT_INVENTARIO_ARTICULO");
 			q.agregarParametroValues("ID_ODE", String.valueOf(ordenEntradaRequest.getIdOrdenEntrada()));
 			q.agregarParametroValues("ID_ARTICULO", String.valueOf(ordenEntradaRequest.getIdArticulo()));
-			q.agregarParametroValues("FOLIO_ARTICULO", "'" +Integer.toString(ordenEntradaRequest.getIdInventarioArticulo()+i).concat(Integer.toString(ordenEntradaRequest.getFolioProveedor()).concat(ConsultaConstantes.filter(ordenEntradaRequest.getDesModeloArticulo()).toUpperCase()))+ "'");
+			q.agregarParametroValues("CVE_FOLIO_ARTICULO", "'" +Integer.toString(ordenEntradaRequest.getIdInventarioArticulo()+i).concat(Integer.toString(ordenEntradaRequest.getFolioProveedor()).concat(ConsultaConstantes.filter(ordenEntradaRequest.getDesModeloArticulo()).toUpperCase()))+ "'");
 			q.agregarParametroValues("ID_TIPO_ASIGNACION_ART", String.valueOf(1));
 			q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
 			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);

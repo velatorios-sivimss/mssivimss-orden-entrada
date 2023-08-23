@@ -19,7 +19,7 @@ public class ConsultaStock {
 	public DatosRequest consultarOrdenEntradaPorVelatorio(DatosRequest request, UsuarioDto usuarioDto) {
 		log.info(" INICIO - consultarOrdenEntradaPorVelatorio");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SOE.ID_ODE AS ID_ODE","SOE.NUM_FOLIO AS NUM_FOLIO").from("SVT_ORDEN_ENTRADA SOE")
+		queryUtil.select("SOE.ID_ODE AS ID_ODE","SOE.CVE_FOLIO AS NUM_FOLIO").from("SVT_ORDEN_ENTRADA SOE")
 		.innerJoin("SVT_CONTRATO SC", "SC.ID_CONTRATO = SOE.ID_CONTRATO").where("SOE.IND_ACTIVO = 1")
 		.and("SC.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
 		final String query = queryUtil.build();
@@ -59,7 +59,7 @@ public class ConsultaStock {
 	public DatosRequest consultarStock(DatosRequest request, ConsultaStockRequest consultaStockRequest,  String formatoFecha) {
 		log.info(" INICIO - consultarStock");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.NUM_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
+		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.CVE_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
 				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_INVENTARIO_ARTICULO SIA")
 		.innerJoin("SVT_ORDEN_ENTRADA OE", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)")
 		.innerJoin("SVT_ARTICULO A","A.ID_ARTICULO = SIA.ID_ARTICULO")
