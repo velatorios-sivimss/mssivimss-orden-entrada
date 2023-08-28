@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.imss.sivimss.orden.entrada.beans.ConsultaStock;
+import com.imss.sivimss.orden.entrada.model.request.CategoriaRequest;
 import com.imss.sivimss.orden.entrada.model.request.ConsultaStockRequest;
-import com.imss.sivimss.orden.entrada.model.request.UsuarioDto;
+import com.imss.sivimss.orden.entrada.model.request.OrdenEntradaRequest;
 import com.imss.sivimss.orden.entrada.service.ConsultaStockService;
 import com.imss.sivimss.orden.entrada.util.AppConstantes;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
@@ -33,6 +34,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
 	private static final String CONSULTA_GENERICA = "/consulta";
+	private static final String CONSULTA_PAGINADO = "/paginado";
 	private static final String CONSULTA = "consulta";
 	
 	@Autowired
@@ -50,16 +52,19 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	@Override
 	public Response<Object> consultarOrdenEntradaPorVelatorio(DatosRequest request, Authentication authentication)
 			throws IOException {
-		 UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		String consulta = "";
 		try {
+			OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
 			
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar orden entrada por velatorio ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarOrdenEntradaPorVelatorio(request,  usuarioDto).getDatos(),
+			 consulta = new ConsultaStock().consultarOrdenEntradaPorVelatorio(request, ordenEntradaRequest).getDatos().get(AppConstantes.QUERY).toString();
+			
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarOrdenEntradaPorVelatorio(request,  ordenEntradaRequest).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new ConsultaStock().consultarOrdenEntradaPorVelatorio(request, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
+			
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -71,15 +76,19 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	@Override
 	public Response<Object> consultarDescripcionCategoria(DatosRequest request, Authentication authentication)
 			throws IOException {
+		String consulta = "";
 		try {
 			
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar descripcion categoria ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarDescripcionCategoria(request).getDatos(),
+			CategoriaRequest categoriaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), CategoriaRequest.class);
+			
+			consulta = new ConsultaStock().consultarDescripcionCategoria(request, categoriaRequest).getDatos().get(AppConstantes.QUERY).toString();
+			
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarDescripcionCategoria(request, categoriaRequest).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new ConsultaStock().consultarDescripcionCategoria(request).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -116,7 +125,7 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar stock", CONSULTA, authentication);
 			
 			Response<Object> response = providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos(),
-					urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
+					urlModCatalogos.concat(CONSULTA_PAGINADO), authentication);
 			if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
 				return MensajeResponseUtil.mensajeResponseObject(response);
 			}
@@ -125,6 +134,29 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 
 		} catch (Exception e) {
 			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
+			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
+			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
+			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
+					authentication);
+			throw new IOException(ERROR_INFORMACION, e.getCause());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarProveedor(DatosRequest request, Authentication authentication) throws IOException {
+		String consulta = "";
+		try {
+			OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
+			
+			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar orden entrada por velatorio ", CONSULTA, authentication);
+
+			 consulta = new ConsultaStock().consultarProveedor(request, ordenEntradaRequest).getDatos().get(AppConstantes.QUERY).toString();
+			
+			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarProveedor(request,  ordenEntradaRequest).getDatos(),
+					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
+
+		} catch (Exception e) {
+			
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,

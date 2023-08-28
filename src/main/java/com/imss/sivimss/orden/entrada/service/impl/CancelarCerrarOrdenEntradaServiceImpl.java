@@ -59,15 +59,18 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 	@Override
 	public Response<Object> consultarDetalleOrdenEntrada(DatosRequest request, Authentication authentication)
 			throws IOException {
-		OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
+		String consulta = "";
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consulta detalle orden entrada ", CONSULTA, authentication);
 
+			OrdenEntradaRequest ordenEntradaRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
+			
+			consulta = new CancelarCerrarOrdenEntrada().consultarDetalleOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
+			
 			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().consultarDetalleOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
-			String consulta = new CancelarCerrarOrdenEntrada().consultarDetalleOrdenEntrada(request, ordenEntradaRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,

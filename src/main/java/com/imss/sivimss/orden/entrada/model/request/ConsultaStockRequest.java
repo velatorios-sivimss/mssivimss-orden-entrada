@@ -14,7 +14,7 @@ public class ConsultaStockRequest{
 	@JsonProperty
 	private Integer idCategoriaArticulo;
 	@JsonProperty
-	private Integer idTipoAsignacionArt;
+	private String idTipoAsignacionArt;
 	@JsonProperty
 	private String tipoReporte;
 	private Double version =5.2D;

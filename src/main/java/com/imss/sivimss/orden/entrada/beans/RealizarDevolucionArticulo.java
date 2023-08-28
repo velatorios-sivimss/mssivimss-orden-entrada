@@ -20,11 +20,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RealizarDevolucionArticulo {
 	
-	public DatosRequest consultarFolioArticulo(DatosRequest request, InventarioArticuloRequest inventarioArticuloRequest) {
+	public DatosRequest consultarFolioArticulo(DatosRequest request, InventarioArticuloRequest inventarioArticuloRequest, String formatoFecha) {
 		log.info(" INICIO - consultarFolioArticulo");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SIA.ID_ODE AS ID_ODE","SIA.ID_INVE_ARTICULO AS ID_INVE_ARTICULO","SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO")
-		.from("SVT_INVENTARIO_ARTICULO SIA").innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SIA.ID_ARTICULO").where("SIA.CVE_FOLIO_ARTICULO = :numFolioArticulo")
+		queryUtil.select("SIA.ID_ODE AS ID_ODE","SOE.CVE_FOLIO AS NUM_FOLIO_ODE",
+		"DATE_FORMAT(SOE.FEC_INGRESO,'"+ formatoFecha+"') AS FEC_ODE","SIA.ID_INVE_ARTICULO AS ID_INVE_ARTICULO",
+		"SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO")
+		.from("SVT_INVENTARIO_ARTICULO SIA").innerJoin("SVT_ORDEN_ENTRADA SOE", "SOE.ID_ODE  = SIA.ID_ODE")
+		.innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SIA.ID_ARTICULO").where("SIA.CVE_FOLIO_ARTICULO = :numFolioArticulo")
 		.setParameter("numFolioArticulo", inventarioArticuloRequest.getNumFolioArticulo());
 		final String query = queryUtil.build();
 		log.info(" consultarFolioArticulo: " + query );

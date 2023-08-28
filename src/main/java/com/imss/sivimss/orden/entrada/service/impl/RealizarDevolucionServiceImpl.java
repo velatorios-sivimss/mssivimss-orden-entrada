@@ -52,17 +52,23 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 	@Autowired 
 	private ModelMapper modelMapper;
 	
+	@Value("${formato_fecha}")
+	private String formatoFecha;
+	
 	@Override
 	public Response<Object> consultarFolioArticulo(DatosRequest request, Authentication authentication)throws IOException {
-		InventarioArticuloRequest inventarioArticuloRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), InventarioArticuloRequest.class);
+		String consulta = "";
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar contrato articulo ", CONSULTA, authentication);
 
-			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos(),
+			InventarioArticuloRequest inventarioArticuloRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), InventarioArticuloRequest.class);
+			
+			 consulta = new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
+			
+			return MensajeResponseUtil.mensajeConsultaResponse(providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest, formatoFecha).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication),NO_SE_ENCONTRO_INFORMACION);
 
 		} catch (Exception e) {
-			String consulta = new RealizarDevolucionArticulo().consultarFolioArticulo(request, inventarioArticuloRequest).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -73,11 +79,18 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 	
 	@Override
 	public Response<Object> actualizarInventarioArticulo(DatosRequest request, Authentication authentication) throws IOException {
-		InventarioArticuloRequest inventarioArticuloRequest= new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), InventarioArticuloRequest.class);
-		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		String consulta = "";
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," actualizar inventario articulo ", MODIFICACION, authentication);
+				
+				InventarioArticuloRequest inventarioArticuloRequest= new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), InventarioArticuloRequest.class);
+				
+				UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+				
+				consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
+				
 				List<OrdenEntradaResponse> ordenEntradaResponse;
+				
 				Response<Object> response =  providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarOrdenEntrada(request, inventarioArticuloRequest).getDatos(),
 						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
 				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
@@ -87,7 +100,6 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
-            String consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
             logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, MODIFICACION, authentication);

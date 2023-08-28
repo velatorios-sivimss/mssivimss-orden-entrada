@@ -11,6 +11,8 @@ public interface ConsultaStockService {
 	
 	Response<Object> consultarOrdenEntradaPorVelatorio(DatosRequest request, Authentication authentication)throws IOException;
 	
+	Response<Object> consultarProveedor(DatosRequest request, Authentication authentication)throws IOException;
+	
 	Response<Object> consultarDescripcionCategoria(DatosRequest request, Authentication authentication)throws IOException;
 	
 	Response<Object> consultarTipoAsignacionArticulo(DatosRequest request, Authentication authentication)throws IOException;

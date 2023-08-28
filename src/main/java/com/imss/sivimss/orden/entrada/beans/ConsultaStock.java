@@ -4,8 +4,9 @@ import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.imss.sivimss.orden.entrada.model.request.CategoriaRequest;
 import com.imss.sivimss.orden.entrada.model.request.ConsultaStockRequest;
-import com.imss.sivimss.orden.entrada.model.request.UsuarioDto;
+import com.imss.sivimss.orden.entrada.model.request.OrdenEntradaRequest;
 import com.imss.sivimss.orden.entrada.util.AppConstantes;
 import com.imss.sivimss.orden.entrada.util.ConsultaConstantes;
 import com.imss.sivimss.orden.entrada.util.DatosRequest;
@@ -16,12 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsultaStock {
 	
-	public DatosRequest consultarOrdenEntradaPorVelatorio(DatosRequest request, UsuarioDto usuarioDto) {
+	public DatosRequest consultarOrdenEntradaPorVelatorio(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest) {
 		log.info(" INICIO - consultarOrdenEntradaPorVelatorio");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SOE.ID_ODE AS ID_ODE","SOE.CVE_FOLIO AS NUM_FOLIO").from("SVT_ORDEN_ENTRADA SOE")
-		.innerJoin("SVT_CONTRATO SC", "SC.ID_CONTRATO = SOE.ID_CONTRATO").where("SOE.IND_ACTIVO = 1")
-		.and("SC.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(usuarioDto.getIdVelatorio()));
+		.innerJoin("SVT_CONTRATO SC", "SC.ID_CONTRATO = SOE.ID_CONTRATO").where("SC.IND_ACTIVO = 1")
+		.and("SOE.CVE_FOLIO LIKE'%"+ordenEntradaRequest.getNumFolioOrdenEntrada()+"%'")
+		.and("SC.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(ordenEntradaRequest.getIdVelatorio()));
 		final String query = queryUtil.build();
 		log.info(" consultarOrdenEntradaPorVelatorio: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
@@ -31,11 +33,27 @@ public class ConsultaStock {
 		return request;
 	}
 	
-	public DatosRequest consultarDescripcionCategoria(DatosRequest request) {
+	public DatosRequest consultarProveedor(DatosRequest request, OrdenEntradaRequest ordenEntradaRequest) {
+		log.info(" INICIO - consultarContratoProveedor");
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil
+				.select("SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.NOM_PROVEEDOR AS NOM_PROVEEDOR")
+				.from("SVT_PROVEEDOR SP")
+				.where("SP.IND_ACTIVO = 1").and("SP.NOM_PROVEEDOR LIKE'%"+ordenEntradaRequest.getNomProveedor()+"%'");
+		final String query = queryUtil.build();
+		log.info(" consultarContratoProveedor: " + query);
+		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
+		request.getDatos().put(AppConstantes.QUERY, encoded);
+		log.info(" TERMINO - consultarContratoProveedor");
+		return request;
+	}
+	
+	public DatosRequest consultarDescripcionCategoria(DatosRequest request, CategoriaRequest categoriaRequest) {
 		log.info(" INICIO - consultarDescripcionCategoria");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("DISTINCT SA.ID_CATEGORIA_ARTICULO AS ID_CATEGORIA_ARTICULO","SCA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO").from("SVT_ARTICULO SA")
-		.innerJoin("SVC_CATEGORIA_ARTICULO SCA", "SCA.ID_CATEGORIA_ARTICULO = SA.ID_CATEGORIA_ARTICULO").and("SA.IND_ACTIVO = 1");
+		.innerJoin("SVC_CATEGORIA_ARTICULO SCA", "SCA.ID_CATEGORIA_ARTICULO = SA.ID_CATEGORIA_ARTICULO").where("SA.IND_ACTIVO = 1")
+		.and("SCA.DES_CATEGORIA_ARTICULO LIKE'%"+categoriaRequest.getDesCategoria()+"%'");
 		final String query = queryUtil.build();
 		log.info(" consultarDescripcionCategoria: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
@@ -59,7 +77,7 @@ public class ConsultaStock {
 	public DatosRequest consultarStock(DatosRequest request, ConsultaStockRequest consultaStockRequest,  String formatoFecha) {
 		log.info(" INICIO - consultarStock");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.CVE_FOLIO AS NUM_FOLIO_ODE","SIA.FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
+		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.CVE_FOLIO AS NUM_FOLIO_ODE","SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
 				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_INVENTARIO_ARTICULO SIA")
 		.innerJoin("SVT_ORDEN_ENTRADA OE", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)")
 		.innerJoin("SVT_ARTICULO A","A.ID_ARTICULO = SIA.ID_ARTICULO")
@@ -79,7 +97,7 @@ public class ConsultaStock {
 		}
 		
 		if (consultaStockRequest.getIdTipoAsignacionArt() != null) {
-			queryUtil.and("SIA.ID_TIPO_ASIGNACION_ART = :idTipoAsignacionArt").setParameter("idTipoAsignacionArt", consultaStockRequest.getIdTipoAsignacionArt());
+			queryUtil.and("SIA.ID_TIPO_ASIGNACION_ART IN (".concat(consultaStockRequest.getIdTipoAsignacionArt()).concat(")"));
 		}
 		
 		final String query = queryUtil.build();
