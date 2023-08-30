@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RealizarDevolucionServiceImpl implements RealizarDevolucionService {
 	
 	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu
+	private static final String DEVOLUCION_CORRECTAMENTE = "187"; // Se realizó el registro de devolución correctamente
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
@@ -87,8 +88,6 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 				
 				UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 				
-				consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
-				
 				List<OrdenEntradaResponse> ordenEntradaResponse;
 				
 				Response<Object> response =  providerRestTemplate.consumirServicioObject(new RealizarDevolucionArticulo().consultarOrdenEntrada(request, inventarioArticuloRequest).getDatos(),
@@ -96,7 +95,8 @@ public class RealizarDevolucionServiceImpl implements RealizarDevolucionService 
 				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
 					ordenEntradaResponse = Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
 					inventarioArticuloRequest.setNumArticulo(ordenEntradaResponse.get(0).getNumArticulo());
-					return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicio(new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication));
+					consulta = new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto).toString();
+					return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(new RealizarDevolucionArticulo().actualizarInventarioArticulo(inventarioArticuloRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication), DEVOLUCION_CORRECTAMENTE );
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {

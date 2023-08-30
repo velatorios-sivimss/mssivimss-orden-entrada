@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrdenEntradaService {
 	
 	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu busqueda
+	private static final String CANCELADA_CORRECTAMENTE = "186"; // Orden de entrada cancelada correctamente.
+	private static final String CERRADA_CORRECTAMENTE = "188"; // Orden de entrada cerrada correctamente.
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String NO_ES_POSIBLE_CANCELAR = "184"; // No se encontró información relacionada a tu
@@ -82,10 +84,11 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 	@Override
 	public Response<Object> actualizarOrdenEntrada(DatosRequest request, Authentication authentication)
 			throws IOException {
-		OrdenEntradaRequest ordenEntradaRequest= new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
-		UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
+		String consulta = "";
 		try {
 				logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString()," actualizar inventario articulo ", MODIFICACION, authentication);
+				OrdenEntradaRequest ordenEntradaRequest= new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), OrdenEntradaRequest.class);
+				UsuarioDto usuarioDto = new Gson().fromJson((String) authentication.getPrincipal(), UsuarioDto.class);
 				List<OrdenEntradaResponse> ordenEntradaResponse;
 				Response<Object> response = providerRestTemplate.consumirServicioObject(new CancelarCerrarOrdenEntrada().consultarCantidadArticulo(request, ordenEntradaRequest).getDatos(),
 						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
@@ -95,11 +98,15 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 					ordenEntradaRequest.setIdArticulo(ordenEntradaResponse.get(0).getIdArticulo());
 					ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
 					ordenEntradaRequest.setCantidadInventarioArticulo(ordenEntradaResponse.get(0).getCantidadInventarioArticulo());
-					return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicio(new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication));
+					consulta = new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto).toString();
+					if(ordenEntradaRequest.getIndEstatus() == 2) {
+						return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication), CANCELADA_CORRECTAMENTE);
+						
+					}
+					return MensajeResponseUtil.mensajeResponse(providerRestTemplate.consumirServicio(new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto),urlModCatalogos.concat("/actualizar/multiples"),authentication),  CERRADA_CORRECTAMENTE);
 				}
 				return MensajeResponseUtil.mensajeResponseObject(response);
         } catch (Exception e) {
-            String consulta = new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto).toString();
             String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
             log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
             logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(), this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, MODIFICACION, authentication);

@@ -92,8 +92,6 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 				
 				List<OrdenEntradaResponse> ordenEntradaResponse;
 				
-				consulta = new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
-				
 				Response<Object> response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().consultaFolioOrdenEntrada(request, ordenEntradaRequest, usuarioDto).getDatos(),
 						urlModCatalogos.concat(CONSULTA_GENERICA), authentication);
 				if (response.getCodigo()==200 && !response.getDatos().toString().contains("[]")) {
@@ -102,6 +100,7 @@ public class OrdenEntradaServiceImpl  implements OrdenEntradaService {
 						ordenEntradaRequest.setNumFolioOrdenEntrada(ordenEntradaResponse.get(0).getNumFolio());
 						ordenEntradaRequest.setIdInventarioArticulo(ordenEntradaResponse.get(0).getIdInventarioArticulo()!= null?ordenEntradaResponse.get(0).getIdInventarioArticulo():1);
 						ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
+						consulta = new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos().get(AppConstantes.QUERY).toString();
 						response = providerRestTemplate.consumirServicioObject(new OrdenEntrada().insertarOrdenEntrada(ordenEntradaRequest, usuarioDto).getDatos(),urlModCatalogos.concat("/crearMultiple"), authentication);
 						if(response.getCodigo()==200) {
 							return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new OrdenEntrada().actualizaArticulor(ordenEntradaRequest, usuarioDto).getDatos(),urlModCatalogos.concat("/actualizar"), authentication));

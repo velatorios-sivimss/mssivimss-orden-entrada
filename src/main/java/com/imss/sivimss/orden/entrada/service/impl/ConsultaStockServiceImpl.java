@@ -101,15 +101,17 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 	@Override
 	public Response<Object> consultarTipoAsignacionArticulo(DatosRequest request, Authentication authentication)
 			throws IOException {
+		String consulta = "";
 		try {
 			
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar tipo asignacion articulo ", CONSULTA, authentication);
 
+			consulta = new ConsultaStock().consultarTipoAsignacionArticulo(request).getDatos().get(AppConstantes.QUERY).toString();
+			
 			return MensajeResponseUtil.mensajeResponseObject(providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarTipoAsignacionArticulo(request).getDatos(),
 					urlModCatalogos.concat(CONSULTA_GENERICA), authentication));
 
 		} catch (Exception e) {
-			String consulta = new ConsultaStock().consultarTipoAsignacionArticulo(request).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
@@ -120,9 +122,13 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 
 	@Override
 	public Response<Object> consultarStock(DatosRequest request, Authentication authentication) throws IOException {
-		ConsultaStockRequest consultaStockRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ConsultaStockRequest.class);
+		String consulta = "";
 		try {
 			logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), " consultar stock", CONSULTA, authentication);
+			
+			ConsultaStockRequest consultaStockRequest = new Gson().fromJson(String.valueOf(request.getDatos().get(AppConstantes.DATOS)), ConsultaStockRequest.class);
+			
+			consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			
 			Response<Object> response = providerRestTemplate.consumirServicioObject(new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos(),
 					urlModCatalogos.concat(CONSULTA_PAGINADO), authentication);
@@ -133,7 +139,6 @@ public class ConsultaStockServiceImpl implements ConsultaStockService {
 			return MensajeResponseUtil.mensajeResponse(response,NO_SE_ENCONTRO_INFORMACION );
 
 		} catch (Exception e) {
-			String consulta = new ConsultaStock().consultarStock(request, consultaStockRequest, formatoFecha).getDatos().get(AppConstantes.QUERY).toString();
 			String decoded = new String(DatatypeConverter.parseBase64Binary(consulta));
 			log.error(ERROR_AL_EJECUTAR_EL_QUERY + decoded);
 			logUtil.crearArchivoLog(Level.SEVERE.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(), FALLO_AL_EJECUTAR_EL_QUERY + decoded, CONSULTA,
