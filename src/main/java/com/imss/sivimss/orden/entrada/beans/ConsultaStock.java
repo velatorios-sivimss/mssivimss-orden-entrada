@@ -124,7 +124,7 @@ public class ConsultaStock {
 		}
 		
 		if (consultaStockRequest.getIdTipoAsignacionArt() != null) {
-			query.append(" AND SIA.ID_TIPO_ASIGNACION_ART = ").append(consultaStockRequest.getIdTipoAsignacionArt());
+			query.append(" AND SIA.ID_TIPO_ASIGNACION_ART IN (").append(consultaStockRequest.getIdTipoAsignacionArt()).append(")");
 		}
 		return query.toString();
 	}
