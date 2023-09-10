@@ -33,11 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrdenEntradaService {
 	
 	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu busqueda
-	private static final String CANCELADA_CORRECTAMENTE = "186"; // Orden de entrada cancelada correctamente.
-	private static final String CERRADA_CORRECTAMENTE = "188"; // Orden de entrada cerrada correctamente.
+	private static final String CANCELADA_CORRECTAMENTE = "205"; // Orden de entrada cancelada correctamente.
+	private static final String CERRADA_CORRECTAMENTE = "207"; // Orden de entrada cerrada correctamente.
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
-	private static final String NO_ES_POSIBLE_CANCELAR = "184"; // No se encontró información relacionada a tu
+	private static final String NO_ES_POSIBLE_CANCELAR = "203"; // No se encontró información relacionada a tu
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
 	private static final String CONSULTA_GENERICA = "/consulta";
 	private static final String MODIFICACION = "modificacion";

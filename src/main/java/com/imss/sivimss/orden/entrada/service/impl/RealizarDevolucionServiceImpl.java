@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RealizarDevolucionServiceImpl implements RealizarDevolucionService {
 	
 	private static final String NO_SE_ENCONTRO_INFORMACION = "45"; // No se encontró información relacionada a tu
-	private static final String DEVOLUCION_CORRECTAMENTE = "187"; // Se realizó el registro de devolución correctamente
+	private static final String DEVOLUCION_CORRECTAMENTE = "206"; // Se realizó el registro de devolución correctamente
 	private static final String ERROR_AL_EJECUTAR_EL_QUERY = "Error al ejecutar el query ";
 	private static final String FALLO_AL_EJECUTAR_EL_QUERY = "Fallo al ejecutar el query: ";
 	private static final String ERROR_INFORMACION = "52";  // Error al consultar la información.
