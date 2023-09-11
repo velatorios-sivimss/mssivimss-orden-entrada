@@ -173,9 +173,15 @@ public class OrdenEntrada {
 	}
 	
 	public DatosRequest consultarContratoCosto(DatosRequest request, ContratoRequest contrato) {
-		log.info(" INICIO - consultarContratoModelo");
+		log.info(" INICIO - consultarContratoCosto");
+		StringBuilder subQuery =new StringBuilder();
+		subQuery.append("(SELECT SUM(DISTINCT").append("  SOE.NUM_ARTICULO) AS CANTIDAD_UTILIZADA ").append(" FROM SVT_ORDEN_ENTRADA SOE ")
+		.append(" INNER JOIN SVT_INVENTARIO_ARTICULO SIA ON SOE.ID_ODE = SIA.ID_ODE ").append(" RIGHT JOIN SVT_CONTRATO SC ON SC.ID_CONTRATO = SOE.ID_CONTRATO ")
+		.append(" INNER JOIN SVT_CONTRATO_ARTICULOS SCA ON SC.ID_CONTRATO = SCA.ID_CONTRATO ").append(" INNER JOIN SVT_ARTICULO A ON A.ID_ARTICULO = SIA.ID_ARTICULO ")
+		.append(" INNER JOIN SVC_CATEGORIA_ARTICULO CA ON A.ID_CATEGORIA_ARTICULO = CA.ID_CATEGORIA_ARTICULO ").append(" WHERE SOE.ID_CONTRATO = ").append(contrato.getIdContrato())
+		.append(" AND SIA.ID_ARTICULO = ").append(contrato.getIdArticulo()).append(" AND CA.ID_CATEGORIA_ARTICULO = ").append(contrato.getIdCategoriaArticulo()).append(") ");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("SCA.NUM_CANTIDAD - COUNT(SIA.ID_ODE) AS NUM_CANTIDAD_DISPONIBLE","A.ID_ARTICULO AS ID_ARTICULO",
+		queryUtil.select("DISTINCT SCA.NUM_CANTIDAD - ".concat(subQuery.toString()).concat("AS NUM_CANTIDAD_DISPONIBLE") ,"A.ID_ARTICULO AS ID_ARTICULO",
 				"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
 		.from("SVT_ORDEN_ENTRADA SOE")
 		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SOE.ID_ODE = SIA.ID_ODE")
@@ -187,11 +193,11 @@ public class OrdenEntrada {
 		.and("SCA.ID_ARTICULO = :idArticulo").setParameter("idArticulo", contrato.getIdArticulo()).and("CA.ID_CATEGORIA_ARTICULO = :idCategoriaArticulo")
 		.setParameter("idCategoriaArticulo", contrato.getIdCategoriaArticulo());
 		final String query = queryUtil.build();
-		log.info(" consultarContratoModelo: " + query );
+		log.info(" consultarContratoCosto: " + query );
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
 		request.getDatos().put(AppConstantes.QUERY, encoded);
 		
-		log.info(" TERMINO - consultarContratoModelo");
+		log.info(" TERMINO - consultarContratoCosto");
 		return request;
 	}
 
