@@ -90,6 +90,10 @@ public class GeneraReporteServiceImpl  implements GeneraReporteService {
 		envioDatos.put("condicion", query);
 		envioDatos.put("tipoReporte", ordenEntradaRequest.getTipoReporte());
 		envioDatos.put("rutaNombreReporte", consultaOrdenEntrada);
+		if(ordenEntradaRequest.getTipoReporte().equals("xls")) {
+			log.info(" entro xls");
+			envioDatos.put("IS_IGNORE_PAGINATION", true);
+		}
 		
 		log.info(" TERMINO - generaReporteConsultaOrdenEntrada");
 		return envioDatos;
@@ -103,6 +107,10 @@ public class GeneraReporteServiceImpl  implements GeneraReporteService {
 		envioDatos.put("condicion", query);
 		envioDatos.put("tipoReporte", consultaStockRequest.getTipoReporte());
 		envioDatos.put("rutaNombreReporte", consultaStock);
+		if(consultaStockRequest.getTipoReporte().equals("xls")) {
+			log.info(" entro xls");
+			envioDatos.put("IS_IGNORE_PAGINATION", true);
+		}
 		
 		log.info(" TERMINO - generaReporteConsultaStock");
 		return envioDatos;
