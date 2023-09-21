@@ -96,7 +96,7 @@ public class CancelarCerrarOrdenEntradaServiceImpl implements CancelarCerrarOrde
 					ordenEntradaResponse=Arrays.asList(modelMapper.map(response.getDatos(), OrdenEntradaResponse[].class));
 					log.info(ordenEntradaResponse.get(0).getIdArticulo()+":"+ordenEntradaResponse.get(0).getCantidadUnidadArticulo()+":"+ordenEntradaResponse.get(0).getCantidadInventarioArticulo());
 					ordenEntradaRequest.setIdArticulo(ordenEntradaResponse.get(0).getIdArticulo());
-					ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo());
+					ordenEntradaRequest.setCantidadUnidadArticulo(ordenEntradaResponse.get(0).getCantidadUnidadArticulo()!=null?ordenEntradaResponse.get(0).getCantidadUnidadArticulo():0);
 					ordenEntradaRequest.setCantidadInventarioArticulo(ordenEntradaResponse.get(0).getCantidadInventarioArticulo());
 					consulta = new CancelarCerrarOrdenEntrada().actualizarOrdenEntrada(ordenEntradaRequest, usuarioDto).toString();
 					if(ordenEntradaRequest.getIndEstatus() == 2) {
