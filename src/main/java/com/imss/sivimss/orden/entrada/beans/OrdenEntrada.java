@@ -175,7 +175,7 @@ public class OrdenEntrada {
 	public DatosRequest consultarContratoCosto(DatosRequest request, ContratoRequest contrato) {
 		log.info(" INICIO - consultarContratoCosto");
 		StringBuilder subQuery =new StringBuilder();
-		subQuery.append("(SELECT SUM(DISTINCT").append("  SOE.NUM_ARTICULO) AS CANTIDAD_UTILIZADA ").append(" FROM SVT_ORDEN_ENTRADA SOE ")
+		subQuery.append("(SELECT IFNULL(SUM(DISTINCT").append("  SOE.NUM_ARTICULO),0) AS CANTIDAD_UTILIZADA ").append(" FROM SVT_ORDEN_ENTRADA SOE ")
 		.append(" INNER JOIN SVT_INVENTARIO_ARTICULO SIA ON SOE.ID_ODE = SIA.ID_ODE ").append(" RIGHT JOIN SVT_CONTRATO SC ON SC.ID_CONTRATO = SOE.ID_CONTRATO ")
 		.append(" INNER JOIN SVT_CONTRATO_ARTICULOS SCA ON SC.ID_CONTRATO = SCA.ID_CONTRATO ").append(" INNER JOIN SVT_ARTICULO A ON A.ID_ARTICULO = SIA.ID_ARTICULO ")
 		.append(" INNER JOIN SVC_CATEGORIA_ARTICULO CA ON A.ID_CATEGORIA_ARTICULO = CA.ID_CATEGORIA_ARTICULO ").append(" WHERE SOE.ID_CONTRATO = ").append(contrato.getIdContrato())
