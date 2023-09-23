@@ -175,9 +175,9 @@ public class OrdenEntrada {
 	public DatosRequest consultarContratoCosto(DatosRequest request, ContratoRequest contrato) {
 		log.info(" INICIO - consultarContratoCosto");
 		StringBuilder subQuery =new StringBuilder();
-		subQuery.append("(SELECT IFNULL(SUM(DISTINCT").append("  SOE.NUM_ARTICULO),0) AS CANTIDAD_UTILIZADA ").append(" FROM SVT_ORDEN_ENTRADA SOE ")
-		.append(" INNER JOIN SVT_INVENTARIO_ARTICULO SIA ON SOE.ID_ODE = SIA.ID_ODE ").append(" RIGHT JOIN SVT_CONTRATO SC ON SC.ID_CONTRATO = SOE.ID_CONTRATO ")
-		.append(" INNER JOIN SVT_CONTRATO_ARTICULOS SCA ON SC.ID_CONTRATO = SCA.ID_CONTRATO ").append(" INNER JOIN SVT_ARTICULO A ON A.ID_ARTICULO = SIA.ID_ARTICULO ")
+		subQuery.append("(SELECT IFNULL(COUNT(*),0) AS CANTIDAD_UTILIZADA ").append(" FROM SVT_ORDEN_ENTRADA SOE ")
+		.append(" INNER JOIN SVT_INVENTARIO_ARTICULO SIA ON SOE.ID_ODE = SIA.ID_ODE AND SIA.IND_ESTATUS NOT IN(2) AND SIA.IND_DEVOLUCION IS NULL")
+		.append(" RIGHT JOIN SVT_CONTRATO SC ON SC.ID_CONTRATO = SOE.ID_CONTRATO ").append(" INNER JOIN SVT_ARTICULO A ON A.ID_ARTICULO = SIA.ID_ARTICULO ")
 		.append(" INNER JOIN SVC_CATEGORIA_ARTICULO CA ON A.ID_CATEGORIA_ARTICULO = CA.ID_CATEGORIA_ARTICULO ").append(" WHERE SOE.ID_CONTRATO = ").append(contrato.getIdContrato())
 		.append(" AND SIA.ID_ARTICULO = ").append(contrato.getIdArticulo()).append(" AND CA.ID_CATEGORIA_ARTICULO = ").append(contrato.getIdCategoriaArticulo()).append(") ");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
@@ -185,7 +185,7 @@ public class OrdenEntrada {
 				"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO","SCA.MON_PRECIO AS MON_PRECIO")
 		.from("SVT_ORDEN_ENTRADA SOE")
 		.innerJoin("SVT_INVENTARIO_ARTICULO SIA", "SOE.ID_ODE = SIA.ID_ODE")
-		.rightJoin(ConsultaConstantes.SVT_CONTRATO_SC, "SC.ID_CONTRATO = SOE.ID_CONTRATO")
+		.rightJoin(ConsultaConstantes.SVT_CONTRATO_SC, "SC.ID_CONTRATO = SOE.ID_CONTRATO").and("SIA.IND_ESTATUS NOT IN(2)").and("SIA.IND_DEVOLUCION IS NULL")
 		.innerJoin(ConsultaConstantes.SVT_CONTRATO_ARTICULOS_SCA,  ConsultaConstantes.SC_ID_CONTRATO_SCA_ID_CONTRATO)
 		.innerJoin(ConsultaConstantes.SVT_ARTICULO_A, ConsultaConstantes.A_ID_ARTICULO_SCA_ID_ARTICULO)
 		.innerJoin(ConsultaConstantes.SVC_CATEGORIA_ARTICULO_CA, ConsultaConstantes.A_ID_CATEGORIA_ARTICULO_CA_ID_CATEGORIA_ARTICULO)
