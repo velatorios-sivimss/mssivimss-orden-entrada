@@ -112,7 +112,7 @@ public class CancelarCerrarOrdenEntrada {
 		final QueryHelper q = new QueryHelper("UPDATE SVT_ORDEN_ENTRADA ");
 		q.agregarParametroValues("ID_ESTATUS_ORDEN_ENTRADA", String.valueOf(ordenEntradaRequest.getIndEstatus()));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q.addWhere("ID_ODE = " + ordenEntradaRequest.getIdOrdenEntrada());
 		
 		String query = q.obtenerQueryActualizar();
@@ -123,7 +123,7 @@ public class CancelarCerrarOrdenEntrada {
 		final QueryHelper q1 = new QueryHelper("UPDATE SVT_INVENTARIO_ARTICULO ");
 		q1.agregarParametroValues("IND_ESTATUS", String.valueOf(ordenEntradaRequest.getIndEstatus()));
 		q1.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q1.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q1.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q1.addWhere("ID_ODE = " + ordenEntradaRequest.getIdOrdenEntrada());
 		
 		String query1 = q1.obtenerQueryActualizar();
@@ -134,7 +134,7 @@ public class CancelarCerrarOrdenEntrada {
 		final QueryHelper q2 = new QueryHelper("UPDATE SVT_ARTICULO");
 		q2.agregarParametroValues("CAN_UNIDAD", Integer.toString(ordenEntradaRequest.getCantidadUnidadArticulo()-ordenEntradaRequest.getCantidadInventarioArticulo()));
 		q2.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q2.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q2.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q2.addWhere("ID_ARTICULO = " + ordenEntradaRequest.getIdArticulo());
 		
 		String query2 = q2.obtenerQueryActualizar();

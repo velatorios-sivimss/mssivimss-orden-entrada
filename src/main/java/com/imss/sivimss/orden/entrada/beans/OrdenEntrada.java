@@ -213,7 +213,7 @@ public class OrdenEntrada {
 		q.agregarParametroValues("FEC_INGRESO", "'" + ordenEntradaRequest.getFecIngreso() + "'");
 		q.agregarParametroValues("IND_ACTIVO", String.valueOf(1));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
-		q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_DATE);
 		q.agregarParametroValues("ID_ESTATUS_ORDEN_ENTRADA", String.valueOf(1));
 		String query = q.obtenerQueryInsertar() + insertInventarioArticulo(ordenEntradaRequest, usuarioDto);
 		log.info(" insertarOrdenEntrada: " + query);
@@ -238,7 +238,7 @@ public class OrdenEntrada {
 			q.agregarParametroValues("CVE_FOLIO_ARTICULO", "'" +String.format("%06d", ordenEntradaRequest.getIdInventarioArticulo()+i).concat(Integer.toString(ordenEntradaRequest.getFolioProveedor()).concat(ConsultaConstantes.filter(ordenEntradaRequest.getDesModeloArticulo()).toUpperCase()))+ "'");
 			q.agregarParametroValues("ID_TIPO_ASIGNACION_ART", String.valueOf(1));
 			q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_ALTA, String.valueOf(usuarioDto.getIdUsuario()));
-			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_TIMESTAMP);
+			q.agregarParametroValues(ConsultaConstantes.FEC_ALTA, ConsultaConstantes.CURRENT_DATE);
 			q.agregarParametroValues("ID_VELATORIO", String.valueOf(usuarioDto.getIdVelatorio()));
 			q.agregarParametroValues("IND_ESTATUS", String.valueOf(0));
 			query.append("$$").append(q.obtenerQueryInsertar());
@@ -255,7 +255,7 @@ public class OrdenEntrada {
 		final QueryHelper q = new QueryHelper("UPDATE SVT_ARTICULO");
 		q.agregarParametroValues("CAN_UNIDAD", Integer.toString(ordenEntradaRequest.getCantidadUnidadArticulo()+ordenEntradaRequest.getNumArticulo()));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q.addWhere("ID_ARTICULO = " + ordenEntradaRequest.getIdArticulo());
 		
 		String query = q.obtenerQueryActualizar();

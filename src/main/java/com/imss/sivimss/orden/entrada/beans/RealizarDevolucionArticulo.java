@@ -63,7 +63,7 @@ public class RealizarDevolucionArticulo {
 		q.agregarParametroValues("DES_MOTIVO_DEVOLUCION", "'" + inventarioArticuloRequest.getDesMotivoDevolucion() +"'");
 		q.agregarParametroValues("IND_ESTATUS", String.valueOf(0));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q.addWhere("ID_INVE_ARTICULO = " + inventarioArticuloRequest.getIdInventarioArticulo());
 		
 		String query = q.obtenerQueryActualizar();
@@ -74,7 +74,7 @@ public class RealizarDevolucionArticulo {
 		final QueryHelper q1 = new QueryHelper("UPDATE SVT_ORDEN_ENTRADA ");
 		q1.agregarParametroValues("NUM_ARTICULO", String.valueOf(inventarioArticuloRequest.getNumArticulo()-1));
 		q1.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
-		q1.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_TIMESTAMP);
+		q1.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);
 		q1.addWhere("ID_ODE = " + inventarioArticuloRequest.getIdOrdenEntrada());
 		
 		String query1 = q1.obtenerQueryActualizar();

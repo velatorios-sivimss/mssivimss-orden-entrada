@@ -12,7 +12,7 @@ public class ConsultaConstantes {
 	public static final String SVC_CATEGORIA_ARTICULO_CA = "SVC_CATEGORIA_ARTICULO CA";
 	public static final String SVT_ORDEN_ENTRADA_SOE = "SVT_ORDEN_ENTRADA SOE";
 	public static final String ID_USUARIO_MODIFICA = "ID_USUARIO_MODIFICA";
-	public static final String CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP()";
+	public static final String CURRENT_DATE = "CURRENT_DATE()";
 	public static final String ID_ORDEN_ENTRADA = "idOrdenEntrada";
 	public static final String FEC_ACTUALIZACION = "FEC_ACTUALIZACION";
 	public static final String ID_USUARIO_ALTA = "ID_USUARIO_ALTA";
