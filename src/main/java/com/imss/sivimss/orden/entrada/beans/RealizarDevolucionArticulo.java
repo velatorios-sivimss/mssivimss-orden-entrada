@@ -25,7 +25,7 @@ public class RealizarDevolucionArticulo {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SIA.ID_ODE AS ID_ODE","SOE.CVE_FOLIO AS NUM_FOLIO_ODE",
 		"DATE_FORMAT(SOE.FEC_INGRESO,'"+ formatoFecha+"') AS FEC_ODE","SIA.ID_INVE_ARTICULO AS ID_INVE_ARTICULO",
-		"SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO")
+		"SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.REF_MODELO_ARTICULO AS DES_MODELO_ARTICULO")
 		.from("SVT_INVENTARIO_ARTICULO SIA").innerJoin("SVT_ORDEN_ENTRADA SOE", "SOE.ID_ODE  = SIA.ID_ODE")
 		.innerJoin("SVT_ARTICULO A", "A.ID_ARTICULO = SIA.ID_ARTICULO").where("SIA.CVE_FOLIO_ARTICULO = :numFolioArticulo")
 		.setParameter("numFolioArticulo", inventarioArticuloRequest.getNumFolioArticulo());
@@ -60,7 +60,7 @@ public class RealizarDevolucionArticulo {
 
 		final QueryHelper q = new QueryHelper("UPDATE SVT_INVENTARIO_ARTICULO ");
 		q.agregarParametroValues("IND_DEVOLUCION", String.valueOf(1));
-		q.agregarParametroValues("DES_MOTIVO_DEVOLUCION", "'" + inventarioArticuloRequest.getDesMotivoDevolucion() +"'");
+		q.agregarParametroValues("REF_MOTIVO_DEVOLUCION", "'" + inventarioArticuloRequest.getDesMotivoDevolucion() +"'");
 		q.agregarParametroValues("IND_ESTATUS", String.valueOf(0));
 		q.agregarParametroValues(ConsultaConstantes.ID_USUARIO_MODIFICA, String.valueOf(usuarioDto.getIdUsuario()));
 		q.agregarParametroValues(ConsultaConstantes.FEC_ACTUALIZACION, ConsultaConstantes.CURRENT_DATE);

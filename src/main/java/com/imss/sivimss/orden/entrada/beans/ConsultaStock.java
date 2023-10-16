@@ -77,7 +77,7 @@ public class ConsultaStock {
 	public DatosRequest consultarStock(DatosRequest request, ConsultaStockRequest consultaStockRequest,  String formatoFecha) {
 		log.info(" INICIO - consultarStock");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
-		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.CVE_FOLIO AS NUM_FOLIO_ODE","SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.DES_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
+		queryUtil.select("DATE_FORMAT(OE.FEC_INGRESO,'"+formatoFecha+"') AS FEC_ODE","OE.CVE_FOLIO AS NUM_FOLIO_ODE","SIA.CVE_FOLIO_ARTICULO AS FOLIO_ARTICULO","A.REF_MODELO_ARTICULO AS DES_MODELO_ARTICULO",
 				"OE.ID_ESTATUS_ORDEN_ENTRADA AS ESTATUS_ORDEN_ENTRADA").from("SVT_INVENTARIO_ARTICULO SIA")
 		.innerJoin("SVT_ORDEN_ENTRADA OE", "SIA.ID_ODE = OE.ID_ODE").and("SIA.IND_ESTATUS NOT IN(2)").and("SIA.IND_DEVOLUCION IS NULL")
 		.innerJoin("SVT_ARTICULO A","A.ID_ARTICULO = SIA.ID_ARTICULO")
