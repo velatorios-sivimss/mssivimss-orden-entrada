@@ -84,19 +84,19 @@ public class ConsultaStock {
 		.innerJoin("SVC_CATEGORIA_ARTICULO CA", "A.ID_CATEGORIA_ARTICULO  = CA.ID_CATEGORIA_ARTICULO")
 		.where("IFNULL(SIA.ID_INVE_ARTICULO ,0) > 0");
 		
-		if (consultaStockRequest.getIdVelatorio() != null) {
+		if (consultaStockRequest.getIdVelatorio() != null && 0 < consultaStockRequest.getIdVelatorio()) {
 			queryUtil.and("SIA.ID_VELATORIO = :idVelatorio").setParameter(ConsultaConstantes.ID_VELATORIO, ConsultaConstantes.getIdVelatorio(consultaStockRequest.getIdVelatorio()));
 		}
 		
-		if (consultaStockRequest.getIdOrdenEntrada() != null) {
+		if (consultaStockRequest.getIdOrdenEntrada() != null &&  0 < consultaStockRequest.getIdOrdenEntrada()) {
 			queryUtil.and("OE.ID_ODE = :idOrdenEntrada").setParameter("idOrdenEntrada", consultaStockRequest.getIdOrdenEntrada());
 		}
 		
-		if (consultaStockRequest.getIdCategoriaArticulo() != null) {
+		if (consultaStockRequest.getIdCategoriaArticulo() != null && 0 < consultaStockRequest.getIdCategoriaArticulo()) {
 			queryUtil.and("CA.ID_CATEGORIA_ARTICULO = :idCategoriaArticulo").setParameter("idCategoriaArticulo", consultaStockRequest.getIdCategoriaArticulo());
 		}
 		
-		if (consultaStockRequest.getIdTipoAsignacionArt() != null) {
+		if (consultaStockRequest.getIdTipoAsignacionArt() != null && !consultaStockRequest.getIdTipoAsignacionArt().isEmpty()) {
 			queryUtil.and("SIA.ID_TIPO_ASIGNACION_ART IN (".concat(consultaStockRequest.getIdTipoAsignacionArt()).concat(")"));
 		}
 		
@@ -111,19 +111,19 @@ public class ConsultaStock {
 	
 	public String condicionconsultarStocka(ConsultaStockRequest consultaStockRequest) {
 		StringBuilder query =new StringBuilder();
-		if(consultaStockRequest.getIdVelatorio() != null) {
+		if(consultaStockRequest.getIdVelatorio() != null && 0 < consultaStockRequest.getIdVelatorio()) {
 			query.append(" AND SIA.ID_VELATORIO = ").append(ConsultaConstantes.getIdVelatorio(consultaStockRequest.getIdVelatorio()));
 		}
 		
-		if (consultaStockRequest.getIdOrdenEntrada() != null) {
+		if (consultaStockRequest.getIdOrdenEntrada() != null &&  0 < consultaStockRequest.getIdOrdenEntrada()) {
 			query.append(" AND OE.ID_ODE = ").append(consultaStockRequest.getIdOrdenEntrada());
 		 }
 		 
-		if (consultaStockRequest.getIdCategoriaArticulo() != null) {
+		if (consultaStockRequest.getIdCategoriaArticulo() != null && 0 < consultaStockRequest.getIdCategoriaArticulo()) {
 			query.append(" AND CA.ID_CATEGORIA_ARTICULO = ").append(consultaStockRequest.getIdCategoriaArticulo());
 		}
 		
-		if (consultaStockRequest.getIdTipoAsignacionArt() != null) {
+		if (consultaStockRequest.getIdTipoAsignacionArt() != null && !consultaStockRequest.getIdTipoAsignacionArt().isEmpty()) {
 			query.append(" AND SIA.ID_TIPO_ASIGNACION_ART IN (").append(consultaStockRequest.getIdTipoAsignacionArt()).append(")");
 		}
 		return query.toString();
