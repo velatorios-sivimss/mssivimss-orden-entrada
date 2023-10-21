@@ -25,7 +25,7 @@ public class OrdenEntrada {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
 				.select("DISTINCT  SOE.ID_ODE AS ID_ODE", "SOE.CVE_FOLIO AS NUM_FOLIO_ODE", "SC.DES_CONTRATO AS DES_CONTRATO",
-						"SP.NOM_PROVEEDOR AS NOM_PROVEEDOR", "SP.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
+						"SP.REF_PROVEEDOR AS NOM_PROVEEDOR", "SP.ID_PROVEEDOR  AS FOLIO_PROVEEDOR",
 						"CA.DES_CATEGORIA_ARTICULO AS DES_CATEGORIA_ARTICULO",
 						"SA.REF_MODELO_ARTICULO AS DES_MODELO_ARTICULO", "SV.DES_VELATORIO AS DES_VELATORIO",
 						"SCA.MON_COSTO_UNITARIO AS MON_COSTO_UNITARIO", "SCA.MON_PRECIO AS MON_PRECIO",
@@ -50,7 +50,7 @@ public class OrdenEntrada {
 				 }
 				 
 				if (ordenEntradaRequest.getNomProveedor() != null && !ordenEntradaRequest.getNomProveedor().isEmpty()) {
-					queryUtil.and("SP.NOM_PROVEEDOR = :nomProveedor").setParameter("nomProveedor",ordenEntradaRequest.getNomProveedor());
+					queryUtil.and("SP.REF_PROVEEDOR = :nomProveedor").setParameter("nomProveedor",ordenEntradaRequest.getNomProveedor());
 				}
 				if ((ordenEntradaRequest.getFechaInicio() != null && ordenEntradaRequest.getFechaFin() != null) && (!ordenEntradaRequest.getFechaInicio().isEmpty() && !ordenEntradaRequest.getFechaFin().isEmpty())) {
 					queryUtil.and("SOE.FEC_INGRESO >= :fecInicio")
@@ -77,7 +77,7 @@ public class OrdenEntrada {
 		 }
 		 
 		if (ordenEntradaRequest.getNomProveedor() != null && !ordenEntradaRequest.getNomProveedor().isEmpty()) {
-			query.append(" AND SP.NOM_PROVEEDOR = '").append(ordenEntradaRequest.getNomProveedor()).append("'");
+			query.append(" AND SP.REF_PROVEEDOR = '").append(ordenEntradaRequest.getNomProveedor()).append("'");
 		}
 		if ((ordenEntradaRequest.getFechaInicio() != null && ordenEntradaRequest.getFechaFin() != null) && (!ordenEntradaRequest.getFechaInicio().isEmpty() && !ordenEntradaRequest.getFechaFin().isEmpty())) {
 			query.append(" AND SOE.FEC_INGRESO >= '").append(ordenEntradaRequest.getFechaInicio()).append("' AND SOE.FEC_INGRESO <= '").append(ordenEntradaRequest.getFechaFin()).append("'");
@@ -121,7 +121,7 @@ public class OrdenEntrada {
 		log.info(" INICIO - consultarContratoProveedor");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("SC.ID_CONTRATO AS ID_CONTRATO","SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.NOM_PROVEEDOR AS NOM_PROVEEDOR",
+				.select("SC.ID_CONTRATO AS ID_CONTRATO","SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.REF_PROVEEDOR AS NOM_PROVEEDOR",
 						"SV.DES_VELATORIO as DES_VELATORIO")
 				.from(ConsultaConstantes.SVT_CONTRATO_SC)
 				.innerJoin("SVT_PROVEEDOR SP", "SP.ID_PROVEEDOR = SC.ID_PROVEEDOR")

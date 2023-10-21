@@ -37,9 +37,9 @@ public class ConsultaStock {
 		log.info(" INICIO - consultarContratoProveedor");
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil
-				.select("SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.NOM_PROVEEDOR AS NOM_PROVEEDOR")
+				.select("SP.ID_PROVEEDOR AS FOLIO_PROVEEDOR","SP.REF_PROVEEDOR AS NOM_PROVEEDOR")
 				.from("SVT_PROVEEDOR SP")
-				.where("SP.IND_ACTIVO = 1").and("SP.NOM_PROVEEDOR LIKE'%"+ordenEntradaRequest.getNomProveedor()+"%'");
+				.where("SP.IND_ACTIVO = 1").and("SP.REF_PROVEEDOR LIKE'%"+ordenEntradaRequest.getNomProveedor()+"%'");
 		final String query = queryUtil.build();
 		log.info(" consultarContratoProveedor: " + query);
 		String encoded = DatatypeConverter.printBase64Binary(query.getBytes(StandardCharsets.UTF_8));
