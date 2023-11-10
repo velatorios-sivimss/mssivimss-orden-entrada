@@ -45,20 +45,17 @@ public class ConsultaConstantes {
 
 	    // Se crea un arreglo que contiene todas las palabras
 	    String palabras[] = word.split(" ");
-
-	        //Se recorren todas las palabras del arreglo
-	        for (String palabra : palabras) {
-	         //si la longitud de la palabra es igual o mayor a 3 caracteres 
-	         //se extraen los primeros 3
-	            if (palabra.length() >= 3) {
-	                builder.append(palabra.substring(0, 3));
-	            } else {
-	         //si la longitud es menor a 3 se agrega la palagra completa
-	                builder.append(palabra);
-	            }
-	        }
-	      //se retorna el string formado por las iniciales
-	      return builder.toString();
+	    
+	    String palabra = palabras[0];
+	    
+	    if (palabra.length() >= 3) {
+            builder.append(palabra.substring(0, 3));
+        } else {
+            builder.append(palabra);
+        }
+	    
+	    //se retorna el string formado por las iniciales
+	    return builder.toString();
 	}
 
 }
